@@ -6,7 +6,7 @@ window.MEDISLOT_CONFIG = {
   googleClientId: "YOUR_CLIENT_ID.apps.googleusercontent.com",
 
   // Gmail addresses allowed to open the doctor dashboard.
-  doctorEmails: ["doctor@gmail.com"],
+  doctorEmails: ["dr.veenadevi@gmail.com"],
 
   clinicName: "Medislot",
   slotStart: "09:00",
