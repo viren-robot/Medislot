@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Book an appointment · Medislot</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
+</head>
+<body data-page="booking">
+  <header>
+    <a class="brand" href="index.html">Medislot</a>
+    <nav>
+      <a href="index.html">Book</a>
+      <a href="doctor.html">Doctor view</a>
+    </nav>
+    <div class="auth" id="auth-bar">
+      <span id="auth-label"></span>
+      <div id="g-signin-wrap"><div id="g-signin"></div></div>
+      <button class="link" id="signout" type="button" hidden>Sign out</button>
+    </div>
+  </header>
+
+  <main>
+    <p class="msg info" id="auth-notice" hidden></p>
+
+    <section class="card">
+      <h1>Book an appointment</h1>
+      <p class="sub">Choose a day and a free time slot. Sign in with Gmail to fill in your details automatically.</p>
+
+      <form id="booking-form" novalidate>
+        <div class="grid">
+          <div>
+            <label for="name">Full name *</label>
+            <input id="name" name="name" autocomplete="name" required>
+          </div>
+          <div>
+            <label for="email">Email *</label>
+            <input id="email" name="email" type="email" autocomplete="email" required>
+          </div>
+          <div>
+            <label for="phone">Phone *</label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" required>
+          </div>
+          <div>
+            <label for="date">Date *</label>
+            <input id="date" name="date" type="date" required>
+          </div>
+          <div>
+            <label for="time">Time *</label>
+            <select id="time" name="time" required></select>
+          </div>
+          <div class="full">
+            <label for="reason">Reason for visit</label>
+            <textarea id="reason" name="reason" placeholder="e.g. annual check-up, fever, follow-up"></textarea>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" type="submit">Book appointment</button>
+        </div>
+        <div class="msg" id="booking-msg" hidden></div>
+      </form>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

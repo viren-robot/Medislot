@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Doctor view · Medislot</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
+</head>
+<body data-page="doctor">
+  <header>
+    <a class="brand" href="index.html">Medislot</a>
+    <nav>
+      <a href="index.html">Book</a>
+      <a href="doctor.html">Doctor view</a>
+    </nav>
+    <div class="auth" id="auth-bar">
+      <span id="auth-label"></span>
+      <div id="g-signin-wrap"><div id="g-signin"></div></div>
+      <button class="link" id="signout" type="button" hidden>Sign out</button>
+    </div>
+  </header>
+
+  <main>
+    <p class="msg info" id="auth-notice" hidden></p>
+
+    <section class="card" id="gate">
+      <h1>Doctor sign-in</h1>
+      <p class="sub" id="gate-text">Sign in with your doctor Gmail account to see appointments.</p>
+    </section>
+
+    <div id="dashboard" hidden>
+      <div class="stats">
+        <div class="stat"><div class="n" id="stat-today">0</div><div class="l">Booked today</div></div>
+        <div class="stat"><div class="n" id="stat-upcoming">0</div><div class="l">Upcoming (active)</div></div>
+        <div class="stat"><div class="n" id="stat-total">0</div><div class="l">All records</div></div>
+      </div>
+
+      <section class="card">
+        <div class="toolbar">
+          <div>
+            <label for="filter-date">Day</label>
+            <input id="filter-date" type="date">
+          </div>
+          <label style="font-weight:400;display:flex;gap:8px;align-items:center;margin:0 0 6px">
+            <input id="show-all" type="checkbox" style="width:auto"> Show all days
+          </label>
+        </div>
+        <div id="appt-list"></div>
+      </section>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
