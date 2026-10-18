@@ -27,6 +27,14 @@ then open http://localhost:8080. Google sign-in requires the page to be served f
 3. Paste the client ID into `googleClientId` in `config.js`.
 4. Put the doctor's Gmail address in `doctorEmails` in `config.js`.
 
+## Email reminders
+
+On the doctor page, **Email reminders** sends one reminder per booked appointment in the current view (the chosen day, or all days). Each row also has a **Send reminder** button. Reminders are sent from the doctor's own Gmail account using the Gmail API, so the doctor sees a permission prompt the first time they send one. An appointment that already has a reminder is marked "reminder sent" and is not sent again.
+
+To use this, enable the **Gmail API** in your Google Cloud project. The `gmail.send` scope is a sensitive scope, so Google may ask you to verify the app before other people can use it. While the app is in testing, only the test users you list can authorize it.
+
+Reminders are sent when the doctor clicks the button. There is no automatic schedule, because a static page cannot run in the background. To send reminders automatically (for example, every morning), you need a small server-side job, such as a scheduled Apps Script or cron job that reads the appointments and calls the Gmail API.
+
 ## Important limitations
 
 - **This is a demo-level store.** Appointments are saved in the browser's `localStorage`, so they are only visible on the device that booked them. A real clinic needs a backend and a database shared between patients and the doctor.

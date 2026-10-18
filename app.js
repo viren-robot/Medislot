@@ -4,6 +4,7 @@
   var cfg = window.MEDISLOT_CONFIG;
   var STORE_KEY = "medislot.appointments.v1";
   var USER_KEY = "medislot.user.v1";
+  var GMAIL_SCOPE = "https://www.googleapis.com/auth/gmail.send";
 
   // ---------- helpers ----------
 
@@ -181,6 +182,86 @@
     }
   }
 
+  // ---------- email reminders (sent through the Gmail API) ----------
+  // Reminders are sent from the doctor's own Gmail account. The browser
+  // asks for the gmail.send permission once; the token stays in memory.
+
+  var gmailToken = null; // { value, expires }
+
+  function getGmailToken() {
+    if (gmailToken && gmailToken.expires > Date.now()) return Promise.resolve(gmailToken.value);
+    if (!isConfigured()) {
+      return Promise.reject(new Error("Gmail is not configured. Set googleClientId in config.js."));
+    }
+    return loadGoogleScript().then(function () {
+      return new Promise(function (resolve, reject) {
+        var client = google.accounts.oauth2.initTokenClient({
+          client_id: cfg.googleClientId,
+          scope: GMAIL_SCOPE,
+          callback: function (resp) {
+            if (resp.error) return reject(new Error("Gmail permission was not granted (" + resp.error + ")."));
+            gmailToken = { value: resp.access_token, expires: Date.now() + (resp.expires_in - 60) * 1000 };
+            resolve(gmailToken.value);
+          },
+          error_callback: function () {
+            reject(new Error("The Gmail permission window was closed."));
+          }
+        });
+        client.requestAccessToken();
+      });
+    });
+  }
+
+  function utf8ToBase64(str) {
+    var bytes = new TextEncoder().encode(str);
+    var bin = "";
+    bytes.forEach(function (b) { bin += String.fromCharCode(b); });
+    return btoa(bin);
+  }
+
+  function base64UrlEncode(str) {
+    return utf8ToBase64(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+
+  function buildReminderMessage(appt) {
+    var when = formatDate(appt.date) + " at " + formatTime(appt.time);
+    var subject = cfg.clinicName + " reminder: your appointment " + when;
+
+    var lines = [
+      "Hello " + appt.name + ",",
+      "",
+      "This is a reminder of your appointment at " + cfg.clinicName + " on " + when + "."
+    ];
+    if (appt.reason) lines.push("Reason for visit: " + appt.reason);
+    lines.push("", "If you need to cancel or change the time, please reply to this email.", "", "See you soon.");
+
+    return [
+      "To: " + appt.email,
+      "Subject: =?UTF-8?B?" + utf8ToBase64(subject) + "?=",
+      "MIME-Version: 1.0",
+      "Content-Type: text/plain; charset=\"UTF-8\"",
+      "Content-Transfer-Encoding: base64",
+      "",
+      utf8ToBase64(lines.join("\r\n"))
+    ].join("\r\n");
+  }
+
+  function sendReminderEmail(appt, token) {
+    return fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" },
+      body: JSON.stringify({ raw: base64UrlEncode(buildReminderMessage(appt)) })
+    }).then(function (res) {
+      if (!res.ok) throw new Error("Gmail returned " + res.status + " for " + appt.email + ".");
+    });
+  }
+
+  function markReminderSent(id) {
+    var all = loadAppointments();
+    all.forEach(function (a) { if (a.id === id) a.reminderSentAt = new Date().toISOString(); });
+    saveAppointments(all);
+  }
+
   // ---------- booking page ----------
 
   function initBooking() {
@@ -262,11 +343,7 @@
       if (user) { form.name.value = user.name; form.email.value = user.email; }
       dateEl.value = isoDate(new Date());
       refreshTimes(false);
-      showMsg(
-        "Booked! " + formatDate(data.date) + " at " + formatTime(data.time) +
-        ". A confirmation will be sent to " + data.email + ".",
-        "ok"
-      );
+      showMsg("Booked! " + formatDate(data.date) + " at " + formatTime(data.time) + ".", "ok");
     });
 
     setupAuth(function (u) {
@@ -297,7 +374,10 @@
     var dateFilter = $("#filter-date");
     var showAll = $("#show-all");
     var list = $("#appt-list");
+    var remindBtn = $("#remind-btn");
+    var remindMsg = $("#reminder-msg");
     var user = null;
+    var sending = false;
 
     dateFilter.value = isoDate(new Date());
 
@@ -314,11 +394,58 @@
       render();
     }
 
-    function render() {
-      if (!isDoctor(user)) return;
+    function visibleAppointments() {
       var all = loadAppointments().slice().sort(function (a, b) {
         return (a.date + a.time).localeCompare(b.date + b.time);
       });
+      return showAll.checked
+        ? all
+        : all.filter(function (a) { return a.date === dateFilter.value; });
+    }
+
+    function showRemindMsg(text, kind) {
+      remindMsg.hidden = false;
+      remindMsg.className = "msg " + kind;
+      remindMsg.textContent = text;
+    }
+
+    // Sends one reminder per appointment, in order. Stops at the first error.
+    function sendReminders(appts) {
+      if (sending) return;
+      if (!appts.length) return showRemindMsg("Nothing to send here. Every booked appointment in this view already has a reminder.", "info");
+
+      sending = true;
+      remindBtn.disabled = true;
+      var sent = 0;
+      showRemindMsg("Connecting to Gmail...", "info");
+
+      getGmailToken()
+        .then(function (token) {
+          return appts.reduce(function (chain, a) {
+            return chain.then(function () {
+              return sendReminderEmail(a, token).then(function () {
+                markReminderSent(a.id);
+                sent++;
+                showRemindMsg("Sent " + sent + " of " + appts.length + "...", "info");
+              });
+            });
+          }, Promise.resolve());
+        })
+        .then(function () {
+          showRemindMsg("Sent " + sent + " reminder" + (sent === 1 ? "" : "s") + ".", "ok");
+        }, function (err) {
+          showRemindMsg((sent ? "Sent " + sent + " before stopping. " : "") + err.message, "error");
+        })
+        .then(function () {
+          sending = false;
+          remindBtn.disabled = false;
+          render();
+        });
+    }
+
+    function render() {
+      if (!isDoctor(user)) return;
+      var all = loadAppointments();
       var today = isoDate(new Date());
 
       var active = all.filter(function (a) { return a.status === "booked"; });
@@ -326,9 +453,10 @@
       $("#stat-upcoming").textContent = active.filter(function (a) { return a.date >= today; }).length;
       $("#stat-total").textContent = all.length;
 
-      var shown = showAll.checked
-        ? all
-        : all.filter(function (a) { return a.date === dateFilter.value; });
+      var shown = visibleAppointments();
+      var pending = shown.filter(function (a) { return a.status === "booked" && !a.reminderSentAt; });
+      remindBtn.textContent = "Email reminders (" + pending.length + ")";
+      remindBtn.disabled = sending || !pending.length;
 
       list.innerHTML = "";
       if (!shown.length) {
@@ -337,20 +465,26 @@
       }
 
       shown.forEach(function (a) {
-        var pill = el("span", { className: "pill " + a.status }, [a.status]);
+        var pills = [el("span", { className: "pill " + a.status }, [a.status])];
+        if (a.reminderSentAt) pills.push(el("span", { className: "pill reminded" }, ["reminder sent"]));
+
         var actions = el("div", { className: "row-actions" });
         if (a.status === "booked") {
-          actions.appendChild(el("button", { className: "btn small", onclick: function () { setStatus(a.id, "done"); } }, ["Mark done"]));
+          if (!a.reminderSentAt) {
+            actions.appendChild(el("button", { className: "btn small", onclick: function () { sendReminders([a]); } }, ["Send reminder"]));
+          }
+          actions.appendChild(el("button", { className: "btn small secondary", onclick: function () { setStatus(a.id, "done"); } }, ["Mark done"]));
           actions.appendChild(el("button", { className: "btn small secondary", onclick: function () { setStatus(a.id, "cancelled"); } }, ["Cancel"]));
         } else {
           actions.appendChild(el("button", { className: "btn small secondary", onclick: function () { setStatus(a.id, "booked"); } }, ["Reopen"]));
         }
         actions.appendChild(el("button", { className: "btn small danger", onclick: function () { removeAppt(a.id); } }, ["Delete"]));
 
+        var nameRow = el("div", {}, [el("strong", {}, [a.name])].concat(pills));
         list.appendChild(el("div", { className: "appt" }, [
           el("div", { className: "time" }, [formatTime(a.time)]),
           el("div", {}, [
-            el("div", {}, [el("strong", {}, [a.name]), pill]),
+            nameRow,
             el("div", { className: "meta" }, [formatDate(a.date) + " · " + a.phone + " · " + a.email]),
             el("div", { className: "reason" }, [a.reason || "No reason given"])
           ]),
@@ -377,6 +511,11 @@
 
     dateFilter.addEventListener("change", render);
     showAll.addEventListener("change", render);
+    remindBtn.addEventListener("click", function () {
+      sendReminders(visibleAppointments().filter(function (a) {
+        return a.status === "booked" && !a.reminderSentAt;
+      }));
+    });
     $("#signout").addEventListener("click", signOut);
     window.addEventListener("storage", render);
 
