@@ -151,7 +151,6 @@ input:focus, select:focus, textarea:focus {
 }
 .pill.done { color: var(--ok); border-color: var(--ok); }
 .pill.cancelled { color: var(--danger); border-color: var(--danger); }
-.pill.reminded { color: var(--brand); border-color: var(--brand); }
 .row-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 
 .empty { color: var(--muted); padding: 16px 0; }
