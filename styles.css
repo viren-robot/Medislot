@@ -66,6 +66,22 @@ header {
 .hero h1 { font-size: 2rem; line-height: 1.2; margin-bottom: 8px; }
 .hero img { width: 100%; height: auto; display: block; }
 
+.label-text { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 4px; }
+.child-row {
+  display: grid;
+  grid-template-columns: 1fr 140px auto;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.child-row .btn[hidden] { display: none; }
+#add-child { margin-top: 4px; }
+.kids { color: var(--text); font-size: 0.9rem; }
+@media (max-width: 600px) {
+  .child-row { grid-template-columns: 1fr 1fr; }
+  .child-row .btn { grid-column: 1 / -1; justify-self: start; }
+}
+
 .login-card { max-width: 480px; margin-left: auto; margin-right: auto; text-align: center; }
 .login-card form { text-align: left; }
 .card-art { display: block; margin: 0 auto 12px; }

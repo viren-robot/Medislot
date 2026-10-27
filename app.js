@@ -62,16 +62,50 @@
 
   // ---------- booking page ----------
 
+  var MAX_AGE = 18;
+  var MAX_CHILDREN = 10;
+
   function initBooking() {
     var form = $("#booking-form");
     var dateEl = $("#date");
     var timeEl = $("#time");
+    var visitEl = $("#visit");
+    var childrenEl = $("#children");
+    var addChildBtn = $("#add-child");
     var msg = $("#booking-msg");
     var submit = form.querySelector("button[type=submit]");
 
     var today = new Date();
     dateEl.min = isoDate(today);
     dateEl.value = isoDate(today);
+
+    // Each child is a name and an age in years. The first row is always there.
+    function addChildRow() {
+      var count = childrenEl.querySelectorAll(".child-row").length;
+      var row = el("div", { className: "child-row" }, [
+        el("input", { className: "child-name", placeholder: "Child's name", "aria-label": "Child's name", autocomplete: "off" }),
+        el("input", { className: "child-age", type: "number", min: "0", max: String(MAX_AGE), step: "1", placeholder: "Age (years)", "aria-label": "Child's age in years" }),
+        el("button", { className: "btn small danger", type: "button", onclick: function () {
+          row.parentNode.removeChild(row);
+          addChildBtn.disabled = false;
+        } }, ["Remove"])
+      ]);
+      if (count === 0) row.querySelector(".btn").hidden = true;
+      childrenEl.appendChild(row);
+      if (childrenEl.querySelectorAll(".child-row").length >= MAX_CHILDREN) addChildBtn.disabled = true;
+    }
+
+    function readChildren() {
+      return Array.prototype.map.call(childrenEl.querySelectorAll(".child-row"), function (row) {
+        return {
+          name: row.querySelector(".child-name").value.trim(),
+          age: row.querySelector(".child-age").value
+        };
+      });
+    }
+
+    addChildBtn.addEventListener("click", addChildRow);
+    addChildRow();
 
     // Only date and time of active bookings are readable by visitors.
     function takenTimes(day) {
@@ -114,14 +148,24 @@
         phone: form.phone.value.trim(),
         date: dateEl.value,
         time: timeEl.value,
-        reason: form.reason.value.trim()
+        visit: visitEl.value
       };
+      var children = readChildren();
 
-      if (!data.name || !data.email || !data.phone || !data.date || !data.time) {
+      if (!data.name || !data.email || !data.phone || !data.date || !data.time || !data.visit) {
         return showMsg(msg, "Please fill in all required fields and pick a time.", "error");
       }
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
         return showMsg(msg, "Please enter a valid email address.", "error");
+      }
+      if (!children.length) {
+        return showMsg(msg, "Please add at least one child.", "error");
+      }
+      var badChild = children.some(function (c) {
+        return !c.name || c.age === "" || Number(c.age) < 0 || Number(c.age) > MAX_AGE || Math.floor(Number(c.age)) !== Number(c.age);
+      });
+      if (badChild) {
+        return showMsg(msg, "Please give every child a name and an age in whole years (0 to " + MAX_AGE + ").", "error");
       }
 
       submit.disabled = true;
@@ -129,7 +173,8 @@
         patient_name: data.name,
         patient_email: data.email,
         patient_phone: data.phone,
-        reason: data.reason,
+        children: children.map(function (c) { return { name: c.name, age: Number(c.age) }; }),
+        reason: data.visit,
         appt_date: data.date,
         appt_time: data.time + ":00",
         status: "booked"
@@ -144,6 +189,9 @@
           return showMsg(msg, "Could not save your booking. Please try again.", "error");
         }
         form.reset();
+        childrenEl.innerHTML = "";
+        addChildBtn.disabled = false;
+        addChildRow();
         dateEl.value = isoDate(new Date());
         refreshTimes();
         showMsg(msg, "Booked! " + formatDate(data.date) + " at " + formatTime(data.time) + ".", "ok");
@@ -262,6 +310,9 @@
 
       shown.forEach(function (a) {
         var time = a.appt_time.slice(0, 5);
+        var kids = (a.children || []).map(function (c) {
+          return c.name + " (" + c.age + (c.age === 1 ? " yr" : " yrs") + ")";
+        }).join(", ");
         var actions = el("div", { className: "row-actions" });
         if (a.status === "booked") {
           actions.appendChild(el("button", { className: "btn small", onclick: function () { changeAppt(a.id, { status: "done" }); } }, ["Mark done"]));
@@ -278,6 +329,7 @@
           el("div", {}, [
             el("div", {}, [el("strong", {}, [a.patient_name]), el("span", { className: "pill " + a.status }, [a.status])]),
             el("div", { className: "meta" }, [formatDate(a.appt_date) + " · " + a.patient_phone + " · " + a.patient_email]),
+            el("div", { className: "kids" }, ["Child: " + (kids || "not given")]),
             el("div", { className: "reason" }, [a.reason || "No reason given"])
           ]),
           actions

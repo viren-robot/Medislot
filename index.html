@@ -35,7 +35,7 @@
       <form id="booking-form" novalidate>
         <div class="grid">
           <div>
-            <label for="name">Full name *</label>
+            <label for="name">Parent's full name *</label>
             <input id="name" name="name" autocomplete="name" required>
           </div>
           <div>
@@ -54,9 +54,21 @@
             <label for="time">Time *</label>
             <select id="time" name="time" required></select>
           </div>
+          <div>
+            <label for="visit">Reason for visit *</label>
+            <select id="visit" name="visit" required>
+              <option value="">Select a reason</option>
+              <option>Vaccination</option>
+              <option>Consultation</option>
+              <option>Ear piercing</option>
+              <option>Observation (less than 6 hrs)</option>
+              <option>Observation (more than 6 hrs)</option>
+            </select>
+          </div>
           <div class="full">
-            <label for="reason">Reason for visit</label>
-            <textarea id="reason" name="reason" placeholder="e.g. annual check-up, fever, follow-up"></textarea>
+            <span class="label-text">Child details *</span>
+            <div id="children"></div>
+            <button class="btn secondary small" id="add-child" type="button">+ Add another child</button>
           </div>
         </div>
 
