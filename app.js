@@ -2,8 +2,7 @@
   "use strict";
 
   var cfg = window.MEDISLOT_CONFIG;
-  var STORE_KEY = "medislot.appointments.v1";
-  var USER_KEY = "medislot.user.v1";
+  var db = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey);
 
   // ---------- helpers ----------
 
@@ -55,130 +54,10 @@
     return out;
   }
 
-  // ---------- storage ----------
-
-  function loadAppointments() {
-    try {
-      return JSON.parse(localStorage.getItem(STORE_KEY)) || [];
-    } catch (err) {
-      return [];
-    }
-  }
-
-  function saveAppointments(list) {
-    localStorage.setItem(STORE_KEY, JSON.stringify(list));
-  }
-
-  function loadUser() {
-    try {
-      return JSON.parse(sessionStorage.getItem(USER_KEY));
-    } catch (err) {
-      return null;
-    }
-  }
-
-  function saveUser(user) {
-    sessionStorage.setItem(USER_KEY, JSON.stringify(user));
-  }
-
-  function clearUser() {
-    sessionStorage.removeItem(USER_KEY);
-  }
-
-  // ---------- Gmail sign-in (Google Identity Services) ----------
-
-  function isConfigured() {
-    return !!cfg.googleClientId && cfg.googleClientId.indexOf("YOUR_CLIENT_ID") !== 0;
-  }
-
-  function decodeJwtPayload(token) {
-    var b64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
-    var json = decodeURIComponent(
-      atob(b64).split("").map(function (c) {
-        return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join("")
-    );
-    return JSON.parse(json);
-  }
-
-  function loadGoogleScript() {
-    return new Promise(function (resolve, reject) {
-      if (window.google && google.accounts) return resolve();
-      var s = document.createElement("script");
-      s.src = "https://accounts.google.com/gsi/client";
-      s.async = true;
-      s.onload = resolve;
-      s.onerror = reject;
-      document.head.appendChild(s);
-    });
-  }
-
-  // Calls onChange(user) whenever the signed-in state changes.
-  function setupAuth(onChange) {
-    var button = $("#g-signin");
-    var notice = $("#auth-notice");
-
-    if (!isConfigured()) {
-      if (notice) {
-        notice.hidden = false;
-        notice.textContent = "Gmail sign-in is not configured yet. Set googleClientId in config.js.";
-        notice.className = "msg error";
-      }
-      onChange(loadUser());
-      return;
-    }
-
-    loadGoogleScript().then(function () {
-      google.accounts.id.initialize({
-        client_id: cfg.googleClientId,
-        callback: function (resp) {
-          var p = decodeJwtPayload(resp.credential);
-          if (!p.email_verified) {
-            if (notice) {
-              notice.hidden = false;
-              notice.className = "msg error";
-              notice.textContent = "That Google account's email is not verified.";
-            }
-            return;
-          }
-          var user = { email: p.email, name: p.name || p.email, picture: p.picture || "" };
-          saveUser(user);
-          if (notice) notice.hidden = true;
-          onChange(user);
-        }
-      });
-      google.accounts.id.renderButton(button, { theme: "outline", size: "medium", text: "signin_with" });
-      onChange(loadUser());
-    }).catch(function () {
-      if (notice) {
-        notice.hidden = false;
-        notice.className = "msg error";
-        notice.textContent = "Could not load Google sign-in. Check your connection and try again.";
-      }
-    });
-  }
-
-  function signOut() {
-    clearUser();
-    if (window.google && google.accounts) google.accounts.id.disableAutoSelect();
-    window.location.reload();
-  }
-
-  function renderAuthBar(user) {
-    var bar = $("#auth-bar");
-    if (!bar) return;
-    var label = $("#auth-label");
-    var signinWrap = $("#g-signin-wrap");
-    var out = $("#signout");
-    if (user) {
-      label.textContent = "Signed in as " + user.email;
-      signinWrap.hidden = true;
-      out.hidden = false;
-    } else {
-      label.textContent = "";
-      signinWrap.hidden = false;
-      out.hidden = true;
-    }
+  function showMsg(node, text, kind) {
+    node.hidden = false;
+    node.className = "msg " + kind;
+    node.textContent = text;
   }
 
   // ---------- booking page ----------
@@ -188,41 +67,44 @@
     var dateEl = $("#date");
     var timeEl = $("#time");
     var msg = $("#booking-msg");
-    var user = null;
+    var submit = form.querySelector("button[type=submit]");
 
     var today = new Date();
     dateEl.min = isoDate(today);
     dateEl.value = isoDate(today);
 
-    function refreshTimes(keepSelection) {
+    // Only date and time of active bookings are readable by visitors.
+    function takenTimes(day) {
+      return db.from("appointments").select("appt_time").eq("appt_date", day).then(function (res) {
+        if (res.error) throw res.error;
+        return res.data.map(function (r) { return r.appt_time.slice(0, 5); });
+      });
+    }
+
+    function refreshTimes() {
+      var day = dateEl.value;
       var previous = timeEl.value;
-      var taken = {};
-      loadAppointments().forEach(function (a) {
-        if (a.date === dateEl.value && a.status !== "cancelled") taken[a.time] = true;
+      if (!day) return Promise.resolve();
+      return takenTimes(day).then(function (taken) {
+        var isToday = day === isoDate(new Date());
+        var now = nowHHMM();
+        timeEl.innerHTML = "";
+        timeEl.appendChild(el("option", { value: "" }, ["Select a time"]));
+        timeSlots().forEach(function (t) {
+          var past = isToday && t <= now;
+          var booked = taken.indexOf(t) !== -1;
+          var label = formatTime(t) + (booked ? " (booked)" : past ? " (passed)" : "");
+          var opt = el("option", { value: t }, [label]);
+          if (booked || past) opt.disabled = true;
+          timeEl.appendChild(opt);
+        });
+        if (previous) timeEl.value = previous;
+      }).catch(function () {
+        showMsg(msg, "Could not load available times. Please refresh the page.", "error");
       });
-      var isToday = dateEl.value === isoDate(new Date());
-      var now = nowHHMM();
-
-      timeEl.innerHTML = "";
-      timeEl.appendChild(el("option", { value: "" }, ["Select a time"]));
-      timeSlots().forEach(function (t) {
-        var past = isToday && t <= now;
-        var unavailable = !!taken[t] || past;
-        var label = formatTime(t) + (taken[t] ? " (booked)" : past ? " (passed)" : "");
-        var opt = el("option", { value: t }, [label]);
-        if (unavailable) opt.disabled = true;
-        timeEl.appendChild(opt);
-      });
-      if (keepSelection && previous) timeEl.value = previous;
     }
 
-    function showMsg(text, kind) {
-      msg.hidden = false;
-      msg.className = "msg " + kind;
-      msg.textContent = text;
-    }
-
-    dateEl.addEventListener("change", function () { refreshTimes(false); });
+    dateEl.addEventListener("change", refreshTimes);
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
@@ -236,95 +118,111 @@
       };
 
       if (!data.name || !data.email || !data.phone || !data.date || !data.time) {
-        return showMsg("Please fill in all required fields and pick a time.", "error");
+        return showMsg(msg, "Please fill in all required fields and pick a time.", "error");
       }
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-        return showMsg("Please enter a valid email address.", "error");
+        return showMsg(msg, "Please enter a valid email address.", "error");
       }
 
-      var list = loadAppointments();
-      var clash = list.some(function (a) {
-        return a.date === data.date && a.time === data.time && a.status !== "cancelled";
+      submit.disabled = true;
+      db.from("appointments").insert({
+        patient_name: data.name,
+        patient_email: data.email,
+        patient_phone: data.phone,
+        reason: data.reason,
+        appt_date: data.date,
+        appt_time: data.time + ":00",
+        status: "booked"
+      }).then(function (res) {
+        submit.disabled = false;
+        if (res.error) {
+          // 23505 = unique violation: someone else took this slot first.
+          if (res.error.code === "23505") {
+            refreshTimes();
+            return showMsg(msg, "That time was just booked. Please choose another.", "error");
+          }
+          return showMsg(msg, "Could not save your booking. Please try again.", "error");
+        }
+        form.reset();
+        dateEl.value = isoDate(new Date());
+        refreshTimes();
+        showMsg(msg, "Booked! " + formatDate(data.date) + " at " + formatTime(data.time) + ".", "ok");
       });
-      if (clash) {
-        refreshTimes(false);
-        return showMsg("That time was just booked. Please choose another.", "error");
-      }
-
-      list.push(Object.assign({
-        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
-        status: "booked",
-        createdAt: new Date().toISOString()
-      }, data));
-      saveAppointments(list);
-
-      form.reset();
-      if (user) { form.name.value = user.name; form.email.value = user.email; }
-      dateEl.value = isoDate(new Date());
-      refreshTimes(false);
-      showMsg("Booked! " + formatDate(data.date) + " at " + formatTime(data.time) + ".", "ok");
     });
 
-    setupAuth(function (u) {
-      user = u;
-      renderAuthBar(u);
-      if (u) {
-        if (!form.name.value) form.name.value = u.name;
-        if (!form.email.value) form.email.value = u.email;
-      }
-    });
-
-    $("#signout").addEventListener("click", signOut);
-
-    refreshTimes(false);
+    refreshTimes();
   }
 
   // ---------- doctor page ----------
 
-  function isDoctor(user) {
-    if (!user) return false;
-    var email = user.email.toLowerCase();
-    return cfg.doctorEmails.some(function (d) { return d.toLowerCase() === email; });
-  }
-
   function initDoctor() {
-    var gate = $("#gate");
-    var dash = $("#dashboard");
+    var loginSection = $("#login");
+    var loginForm = $("#login-form");
+    var loginEmail = $("#login-email");
+    var loginMsg = $("#login-msg");
+    var dashboard = $("#dashboard");
+    var authBar = $("#auth-bar");
+    var authLabel = $("#auth-label");
     var dateFilter = $("#filter-date");
     var showAll = $("#show-all");
     var list = $("#appt-list");
-    var user = null;
+    var dashMsg = $("#dash-msg");
 
+    var appointments = [];
     dateFilter.value = isoDate(new Date());
 
-    function setStatus(id, status) {
-      var all = loadAppointments();
-      all.forEach(function (a) { if (a.id === id) a.status = status; });
-      saveAppointments(all);
-      render();
+    function showLoggedOut() {
+      loginSection.hidden = false;
+      dashboard.hidden = true;
+      authBar.hidden = true;
     }
 
-    function removeAppt(id) {
-      if (!window.confirm("Delete this appointment?")) return;
-      saveAppointments(loadAppointments().filter(function (a) { return a.id !== id; }));
-      render();
+    function showDashboard(session) {
+      loginSection.hidden = true;
+      dashboard.hidden = false;
+      authBar.hidden = false;
+      authLabel.textContent = "Signed in as " + session.user.email;
+      loadAppointments();
+    }
+
+    function loadAppointments() {
+      return db.from("appointments").select("*")
+        .order("appt_date", { ascending: true })
+        .order("appt_time", { ascending: true })
+        .then(function (res) {
+          if (res.error) throw res.error;
+          appointments = res.data;
+          render();
+        })
+        .catch(function () {
+          showMsg(dashMsg, "Could not load appointments.", "error");
+        });
+    }
+
+    // Changes go through row-level security, so a non-doctor gets zero rows back.
+    function changeAppt(id, action) {
+      var query = action.kind === "delete"
+        ? db.from("appointments").delete().eq("id", id).select("id")
+        : db.from("appointments").update({ status: action.status }).eq("id", id).select("id");
+
+      query.then(function (res) {
+        if (res.error || !res.data.length) {
+          return showMsg(dashMsg, "That change was not saved.", "error");
+        }
+        loadAppointments();
+      });
     }
 
     function render() {
-      if (!isDoctor(user)) return;
-      var all = loadAppointments().slice().sort(function (a, b) {
-        return (a.date + a.time).localeCompare(b.date + b.time);
-      });
       var today = isoDate(new Date());
-
-      var active = all.filter(function (a) { return a.status === "booked"; });
-      $("#stat-today").textContent = active.filter(function (a) { return a.date === today; }).length;
-      $("#stat-upcoming").textContent = active.filter(function (a) { return a.date >= today; }).length;
-      $("#stat-total").textContent = all.length;
+      var active = appointments.filter(function (a) { return a.status === "booked"; });
+      $("#stat-today").textContent = active.filter(function (a) { return a.appt_date === today; }).length;
+      $("#stat-upcoming").textContent = active.filter(function (a) { return a.appt_date >= today; }).length;
+      $("#stat-total").textContent = appointments.length;
 
       var shown = showAll.checked
-        ? all
-        : all.filter(function (a) { return a.date === dateFilter.value; });
+        ? appointments
+        : appointments.filter(function (a) { return a.appt_date === dateFilter.value; });
 
       list.innerHTML = "";
       if (!shown.length) {
@@ -333,21 +231,23 @@
       }
 
       shown.forEach(function (a) {
-        var pill = el("span", { className: "pill " + a.status }, [a.status]);
+        var time = a.appt_time.slice(0, 5);
         var actions = el("div", { className: "row-actions" });
         if (a.status === "booked") {
-          actions.appendChild(el("button", { className: "btn small", onclick: function () { setStatus(a.id, "done"); } }, ["Mark done"]));
-          actions.appendChild(el("button", { className: "btn small secondary", onclick: function () { setStatus(a.id, "cancelled"); } }, ["Cancel"]));
+          actions.appendChild(el("button", { className: "btn small", onclick: function () { changeAppt(a.id, { status: "done" }); } }, ["Mark done"]));
+          actions.appendChild(el("button", { className: "btn small secondary", onclick: function () { changeAppt(a.id, { status: "cancelled" }); } }, ["Cancel"]));
         } else {
-          actions.appendChild(el("button", { className: "btn small secondary", onclick: function () { setStatus(a.id, "booked"); } }, ["Reopen"]));
+          actions.appendChild(el("button", { className: "btn small secondary", onclick: function () { changeAppt(a.id, { status: "booked" }); } }, ["Reopen"]));
         }
-        actions.appendChild(el("button", { className: "btn small danger", onclick: function () { removeAppt(a.id); } }, ["Delete"]));
+        actions.appendChild(el("button", { className: "btn small danger", onclick: function () {
+          if (window.confirm("Delete this appointment?")) changeAppt(a.id, { kind: "delete" });
+        } }, ["Delete"]));
 
         list.appendChild(el("div", { className: "appt" }, [
-          el("div", { className: "time" }, [formatTime(a.time)]),
+          el("div", { className: "time" }, [formatTime(time)]),
           el("div", {}, [
-            el("div", {}, [el("strong", {}, [a.name]), pill]),
-            el("div", { className: "meta" }, [formatDate(a.date) + " · " + a.phone + " · " + a.email]),
+            el("div", {}, [el("strong", {}, [a.patient_name]), el("span", { className: "pill " + a.status }, [a.status])]),
+            el("div", { className: "meta" }, [formatDate(a.appt_date) + " · " + a.patient_phone + " · " + a.patient_email]),
             el("div", { className: "reason" }, [a.reason || "No reason given"])
           ]),
           actions
@@ -355,28 +255,43 @@
       });
     }
 
-    function applyUser(u) {
-      user = u;
-      renderAuthBar(u);
-      if (isDoctor(u)) {
-        gate.hidden = true;
-        dash.hidden = false;
-        render();
-      } else {
-        dash.hidden = true;
-        gate.hidden = false;
-        $("#gate-text").textContent = u
-          ? u.email + " is not on the doctor list. Sign in with the doctor's Gmail account."
-          : "Sign in with your doctor Gmail account to see appointments.";
-      }
+    // Signed in, but the email is not on the doctor list: the database hides everything.
+    function checkDoctorAndShow(session) {
+      db.from("doctors").select("email").then(function (res) {
+        if (res.error) return showMsg(loginMsg, "Could not check your access. Please try again.", "error");
+        if (!res.data.length) {
+          return db.auth.signOut().then(function () {
+            showMsg(loginMsg, "This email is not on the doctor list.", "error");
+          });
+        }
+        showDashboard(session);
+      });
     }
 
+    loginForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var email = loginEmail.value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return showMsg(loginMsg, "Please enter a valid email address.", "error");
+      }
+      db.auth.signInWithOtp({
+        email: email,
+        options: { emailRedirectTo: window.location.href.split("#")[0] }
+      }).then(function (res) {
+        if (res.error) return showMsg(loginMsg, "Could not send the link: " + res.error.message, "error");
+        showMsg(loginMsg, "Check your email for a sign-in link. Open it on this device.", "ok");
+      });
+    });
+
+    $("#signout").addEventListener("click", function () { db.auth.signOut(); });
     dateFilter.addEventListener("change", render);
     showAll.addEventListener("change", render);
-    $("#signout").addEventListener("click", signOut);
-    window.addEventListener("storage", render);
 
-    setupAuth(applyUser);
+    // Fires once with the current session, then on sign-in and sign-out.
+    db.auth.onAuthStateChange(function (event, session) {
+      if (session) checkDoctorAndShow(session);
+      else showLoggedOut();
+    });
   }
 
   // ---------- boot ----------

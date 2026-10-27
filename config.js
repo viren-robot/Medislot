@@ -1,16 +1,10 @@
 // Medislot configuration. Edit these values before deploying.
 window.MEDISLOT_CONFIG = {
-  // OAuth 2.0 Web client ID from Google Cloud Console
-  // (APIs & Services > Credentials). Add your site's origin under
-  // "Authorized JavaScript origins".
-  googleClientId: "YOUR_CLIENT_ID.apps.googleusercontent.com",
-
-  // Gmail addresses allowed to open the doctor dashboard.
-  doctorEmails: [
-    "dr.veenadevi@gmail.com",
-    "Viren.n@myglobal.school",
-    "np71421@gmail.com"
-  ],
+  // Supabase project URL and publishable key. The publishable key is safe in
+  // the browser: what visitors can read and write is set by row-level security
+  // in the database, not by hiding this key.
+  supabaseUrl: "https://hpptnujyeczspdfxjopk.supabase.co",
+  supabaseKey: "sb_publishable_pknzhhf-ow2nfuY3sALKfA_25GLhGAp",
 
   clinicName: "Medislot",
   slotStart: "09:00",

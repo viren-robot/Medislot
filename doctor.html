@@ -3,30 +3,40 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Doctor view · Medislot</title>
+  <title>Doctor login · Medislot</title>
   <link rel="stylesheet" href="styles.css">
   <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 </head>
 <body data-page="doctor">
   <header>
     <a class="brand" href="index.html">Medislot</a>
     <nav>
       <a href="index.html">Book</a>
-      <a href="doctor.html">Doctor view</a>
+      <a href="doctor.html">Doctor login</a>
     </nav>
-    <div class="auth" id="auth-bar">
+    <div class="auth" id="auth-bar" hidden>
       <span id="auth-label"></span>
-      <div id="g-signin-wrap"><div id="g-signin"></div></div>
-      <button class="link" id="signout" type="button" hidden>Sign out</button>
+      <button class="link" id="signout" type="button">Sign out</button>
     </div>
   </header>
 
   <main>
-    <p class="msg info" id="auth-notice" hidden></p>
-
-    <section class="card" id="gate">
-      <h1>Doctor sign-in</h1>
-      <p class="sub" id="gate-text">Sign in with your doctor Gmail account to see appointments.</p>
+    <section class="card" id="login">
+      <h1>Doctor login</h1>
+      <p class="sub">Enter your email and we'll send you a sign-in link.</p>
+      <form id="login-form" novalidate>
+        <div class="grid">
+          <div class="full">
+            <label for="login-email">Email</label>
+            <input id="login-email" type="email" autocomplete="email" required>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn" type="submit">Email me a sign-in link</button>
+        </div>
+      </form>
+      <div class="msg" id="login-msg" hidden></div>
     </section>
 
     <div id="dashboard" hidden>
@@ -46,6 +56,7 @@
             <input id="show-all" type="checkbox" style="width:auto"> Show all days
           </label>
         </div>
+        <div class="msg" id="dash-msg" hidden></div>
         <div id="appt-list"></div>
       </section>
     </div>

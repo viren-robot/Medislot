@@ -6,27 +6,21 @@
   <title>Book an appointment · Medislot</title>
   <link rel="stylesheet" href="styles.css">
   <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 </head>
 <body data-page="booking">
   <header>
     <a class="brand" href="index.html">Medislot</a>
     <nav>
       <a href="index.html">Book</a>
-      <a href="doctor.html">Doctor view</a>
+      <a href="doctor.html">Doctor login</a>
     </nav>
-    <div class="auth" id="auth-bar">
-      <span id="auth-label"></span>
-      <div id="g-signin-wrap"><div id="g-signin"></div></div>
-      <button class="link" id="signout" type="button" hidden>Sign out</button>
-    </div>
   </header>
 
   <main>
-    <p class="msg info" id="auth-notice" hidden></p>
-
     <section class="card">
       <h1>Book an appointment</h1>
-      <p class="sub">Choose a day and a free time slot. Sign in with Gmail to fill in your details automatically.</p>
+      <p class="sub">Choose a day and a free time slot.</p>
 
       <form id="booking-form" novalidate>
         <div class="grid">

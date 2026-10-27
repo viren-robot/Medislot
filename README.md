@@ -1,34 +1,35 @@
 # Medislot
 
-A static website for booking doctor appointments, with a doctor view and Gmail sign-in.
+A static website for booking doctor appointments, with a doctor login.
 
 ## Files
 
-- `index.html`: booking page for patients (pick a day and a free time slot).
-- `doctor.html`: doctor dashboard. Lists appointments, lets the doctor mark them done, cancel, or delete. Only accessible to Gmail addresses on the doctor list.
-- `app.js`: shared logic (booking, storage, Google sign-in, dashboard).
+- `index.html`: booking page for patients. Patients pick a day and a free time slot, no sign-in needed.
+- `doctor.html`: doctor page. The doctor enters their email, gets a sign-in link, and then manages appointments.
+- `app.js`: booking and dashboard logic, talking to Supabase.
 - `styles.css`: styling, with automatic dark mode.
-- `config.js`: settings (Google client ID, doctor emails, clinic hours).
+- `config.js`: Supabase URL, publishable key, and clinic hours.
 
-## Run it
+## Backend (Supabase)
 
-Serve the folder with any static server, for example:
+- **Tables:** `appointments` (bookings) and `doctors` (the emails allowed to manage bookings).
+- **Row-level security:** visitors can book and can read only the date and time of active bookings. Signed-in doctors listed in `doctors` can read, update, and delete appointments.
+- **Double-booking:** a unique index stops two active bookings in the same slot.
 
-```sh
-python3 -m http.server 8080
-```
+The publishable key in `config.js` is meant for browsers. Access rules live in the database.
 
-then open http://localhost:8080. Google sign-in requires the page to be served from `http://localhost` or HTTPS, not opened as a `file://` URL.
+## Setup
 
-## Set up Gmail sign-in
+1. In Supabase, go to **Authentication > URL Configuration** and add your site URL (for example `https://viren-robot.github.io/Medislot/doctor.html`) under **Redirect URLs**. Otherwise the sign-in link won't return to the site.
+2. Make sure a doctor's email is in the `doctors` table. Only those addresses can sign in and see bookings.
+3. Serve the site over `http://localhost` or HTTPS. Supabase sign-in doesn't work from a `file://` URL.
 
-1. In Google Cloud Console, create an OAuth client ID of type **Web application**.
-2. Add your site's origin (for example `http://localhost:8080`) under **Authorized JavaScript origins**.
-3. Paste the client ID into `googleClientId` in `config.js`.
-4. Put the doctor's Gmail address in `doctorEmails` in `config.js`.
+## Sign-in
 
-## Important limitations
+The doctor page emails a one-time sign-in link. Click it on the same device to open the dashboard. Supabase's default email service sends only a small number of emails per hour, which is enough for a clinic's sign-ins but not for bulk email.
 
-- **This is a demo-level store.** Appointments are saved in the browser's `localStorage`, so they are only visible on the device that booked them. A real clinic needs a backend and a database shared between patients and the doctor.
-- **Sign-in is checked only in the browser.** The doctor view trusts the signed-in Gmail address on the client side. Anyone can edit the page to bypass it. Before real use, verify the Google ID token on a server and enforce the doctor check there.
-- Patient and doctor data is health information. Check your legal obligations (for example HIPAA or GDPR) before collecting real patient data.
+## Limitations
+
+- **Patients can't see or change their own bookings.** Add that if needed.
+- **Email reminders are removed.** Sending them needs a scheduled job, which a static site can't run.
+- **Health data.** Patient data is health information. Check your legal obligations (for example HIPAA or GDPR) before using real patient data.
