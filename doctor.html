@@ -17,23 +17,23 @@
     </nav>
     <div class="auth" id="auth-bar" hidden>
       <span id="auth-label"></span>
-      <button class="link" id="signout" type="button">Sign out</button>
+      <button class="link" id="signout" type="button">Log out</button>
     </div>
   </header>
 
   <main>
     <section class="card" id="login">
       <h1>Doctor login</h1>
-      <p class="sub">Enter your email and we'll send you a sign-in link.</p>
+      <p class="sub">Enter your doctor name to see appointments.</p>
       <form id="login-form" novalidate>
         <div class="grid">
           <div class="full">
-            <label for="login-email">Email</label>
-            <input id="login-email" type="email" autocomplete="email" required>
+            <label for="login-code">Doctor name</label>
+            <input id="login-code" type="password" autocomplete="current-password" autocapitalize="none" spellcheck="false" required>
           </div>
         </div>
         <div class="actions">
-          <button class="btn" type="submit">Email me a sign-in link</button>
+          <button class="btn" type="submit">Log in</button>
         </div>
       </form>
       <div class="msg" id="login-msg" hidden></div>

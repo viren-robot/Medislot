@@ -5,28 +5,32 @@ A static website for booking doctor appointments, with a doctor login.
 ## Files
 
 - `index.html`: booking page for patients. Patients pick a day and a free time slot, no sign-in needed.
-- `doctor.html`: doctor page. The doctor enters their email, gets a sign-in link, and then manages appointments.
+- `doctor.html`: doctor page. The doctor types their doctor name and then manages appointments.
 - `app.js`: booking and dashboard logic, talking to Supabase.
 - `styles.css`: styling, with automatic dark mode.
 - `config.js`: Supabase URL, publishable key, and clinic hours.
 
 ## Backend (Supabase)
 
-- **Tables:** `appointments` (bookings) and `doctors` (the emails allowed to manage bookings).
-- **Row-level security:** visitors can book and can read only the date and time of active bookings. Signed-in doctors listed in `doctors` can read, update, and delete appointments.
+- **Tables:** `appointments` (bookings) and `private.doctor_codes` (hashed doctor names, not reachable from the website).
+- **Row-level security:** visitors can book and can read only the date and time of active bookings.
+- **Doctor functions:** `doctor_login`, `doctor_appointments`, `doctor_set_status`, and `doctor_delete_appointment` check the doctor name on every call before touching data.
 - **Double-booking:** a unique index stops two active bookings in the same slot.
 
 The publishable key in `config.js` is meant for browsers. Access rules live in the database.
 
-## Setup
+## Doctor login
 
-1. In Supabase, go to **Authentication > URL Configuration** and add your site URL (for example `https://viren-robot.github.io/Medislot/doctor.html`) under **Redirect URLs**. Otherwise the sign-in link won't return to the site.
-2. Make sure a doctor's email is in the `doctors` table. Only those addresses can sign in and see bookings.
-3. Serve the site over `http://localhost` or HTTPS. Supabase sign-in doesn't work from a `file://` URL.
+Doctors type their doctor name. It isn't case-sensitive. The names are stored hashed in the database and never appear in this repository, so they work like passwords: anyone who knows one can see every booking. Choose names that are hard to guess.
 
-## Sign-in
+To add or change a name, run this in the Supabase SQL editor (replace the name):
 
-The doctor page emails a one-time sign-in link. Click it on the same device to open the dashboard. Supabase's default email service sends only a small number of emails per hour, which is enough for a clinic's sign-ins but not for bulk email.
+```sql
+insert into private.doctor_codes (name, code_hash)
+values ('new-name', extensions.crypt('new-name', extensions.gen_salt('bf', 10)));
+```
+
+To remove one: `delete from private.doctor_codes where name = 'old-name';`
 
 ## Limitations
 

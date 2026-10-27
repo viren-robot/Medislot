@@ -155,10 +155,14 @@
 
   // ---------- doctor page ----------
 
+  // Doctors log in with a name. The database checks it on every call, so the
+  // names never appear in this file. It is kept for the browser tab's session only.
+  var CODE_KEY = "medislot.doctorCode";
+
   function initDoctor() {
     var loginSection = $("#login");
     var loginForm = $("#login-form");
-    var loginEmail = $("#login-email");
+    var loginCode = $("#login-code");
     var loginMsg = $("#login-msg");
     var dashboard = $("#dashboard");
     var authBar = $("#auth-bar");
@@ -169,46 +173,72 @@
     var dashMsg = $("#dash-msg");
 
     var appointments = [];
+    var code = null;
     dateFilter.value = isoDate(new Date());
 
-    function showLoggedOut() {
+    function readCode() {
+      try { return sessionStorage.getItem(CODE_KEY); } catch (err) { return null; }
+    }
+
+    function storeCode(value) {
+      try {
+        if (value) sessionStorage.setItem(CODE_KEY, value);
+        else sessionStorage.removeItem(CODE_KEY);
+      } catch (err) { /* private mode: login lasts until reload */ }
+    }
+
+    function showLoggedOut(text) {
+      code = null;
+      storeCode(null);
+      appointments = [];
+      list.innerHTML = "";
       loginSection.hidden = false;
       dashboard.hidden = true;
       authBar.hidden = true;
+      if (text) showMsg(loginMsg, text, "error");
     }
 
-    function showDashboard(session) {
+    function showDashboard(name) {
       loginSection.hidden = true;
       dashboard.hidden = false;
       authBar.hidden = false;
-      authLabel.textContent = "Signed in as " + session.user.email;
+      authLabel.textContent = "Logged in as " + name;
       loadAppointments();
     }
 
-    function loadAppointments() {
-      return db.from("appointments").select("*")
-        .order("appt_date", { ascending: true })
-        .order("appt_time", { ascending: true })
-        .then(function (res) {
-          if (res.error) throw res.error;
-          appointments = res.data;
-          render();
-        })
-        .catch(function () {
-          showMsg(dashMsg, "Could not load appointments.", "error");
-        });
+    // 28000 = the database rejected the name (removed or changed since login).
+    function handleError(err, fallback) {
+      if (err && err.code === "28000") return showLoggedOut("Please log in again.");
+      showMsg(dashMsg, fallback, "error");
     }
 
-    // Changes go through row-level security, so a non-doctor gets zero rows back.
-    function changeAppt(id, action) {
-      var query = action.kind === "delete"
-        ? db.from("appointments").delete().eq("id", id).select("id")
-        : db.from("appointments").update({ status: action.status }).eq("id", id).select("id");
+    function login(value) {
+      return db.rpc("doctor_login", { code: value }).then(function (res) {
+        if (res.error) return showMsg(loginMsg, "Could not check the name. Please try again.", "error");
+        if (!res.data) return showLoggedOut("That doctor name is not recognised.");
+        code = value;
+        storeCode(value);
+        loginMsg.hidden = true;
+        showDashboard(res.data);
+      });
+    }
 
-      query.then(function (res) {
-        if (res.error || !res.data.length) {
-          return showMsg(dashMsg, "That change was not saved.", "error");
-        }
+    function loadAppointments() {
+      return db.rpc("doctor_appointments", { code: code }).then(function (res) {
+        if (res.error) return handleError(res.error, "Could not load appointments.");
+        dashMsg.hidden = true;
+        appointments = res.data;
+        render();
+      });
+    }
+
+    function changeAppt(id, action) {
+      var call = action.kind === "delete"
+        ? db.rpc("doctor_delete_appointment", { code: code, appt_id: id })
+        : db.rpc("doctor_set_status", { code: code, appt_id: id, new_status: action.status });
+
+      call.then(function (res) {
+        if (res.error) return handleError(res.error, "That change was not saved.");
         loadAppointments();
       });
     }
@@ -255,43 +285,21 @@
       });
     }
 
-    // Signed in, but the email is not on the doctor list: the database hides everything.
-    function checkDoctorAndShow(session) {
-      db.from("doctors").select("email").then(function (res) {
-        if (res.error) return showMsg(loginMsg, "Could not check your access. Please try again.", "error");
-        if (!res.data.length) {
-          return db.auth.signOut().then(function () {
-            showMsg(loginMsg, "This email is not on the doctor list.", "error");
-          });
-        }
-        showDashboard(session);
-      });
-    }
-
     loginForm.addEventListener("submit", function (e) {
       e.preventDefault();
-      var email = loginEmail.value.trim();
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        return showMsg(loginMsg, "Please enter a valid email address.", "error");
-      }
-      db.auth.signInWithOtp({
-        email: email,
-        options: { emailRedirectTo: window.location.href.split("#")[0] }
-      }).then(function (res) {
-        if (res.error) return showMsg(loginMsg, "Could not send the link: " + res.error.message, "error");
-        showMsg(loginMsg, "Check your email for a sign-in link. Open it on this device.", "ok");
-      });
+      var value = loginCode.value.trim();
+      if (!value) return showMsg(loginMsg, "Please enter your doctor name.", "error");
+      loginCode.value = "";
+      login(value);
     });
 
-    $("#signout").addEventListener("click", function () { db.auth.signOut(); });
+    $("#signout").addEventListener("click", function () { showLoggedOut(); });
     dateFilter.addEventListener("change", render);
     showAll.addEventListener("change", render);
 
-    // Fires once with the current session, then on sign-in and sign-out.
-    db.auth.onAuthStateChange(function (event, session) {
-      if (session) checkDoctorAndShow(session);
-      else showLoggedOut();
-    });
+    var saved = readCode();
+    if (saved) login(saved);
+    else showLoggedOut();
   }
 
   // ---------- boot ----------
