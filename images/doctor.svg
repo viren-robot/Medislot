@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-labelledby="title">
+  <title id="title">Stethoscope</title>
+  <circle cx="100" cy="100" r="96" fill="#e6f6f4"/>
+  <path d="M70 40 v50 a30 30 0 0 0 60 0 v-50" fill="none" stroke="#0f766e" stroke-width="10" stroke-linecap="round"/>
+  <path d="M100 120 v20 a26 26 0 0 0 52 0 v-12" fill="none" stroke="#0f766e" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="70" cy="40" r="7" fill="#0f766e"/>
+  <circle cx="130" cy="40" r="7" fill="#0f766e"/>
+  <circle cx="152" cy="118" r="16" fill="#f97316"/>
+  <circle cx="152" cy="118" r="7" fill="#ffffff"/>
+</svg>

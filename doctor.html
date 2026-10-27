@@ -3,14 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Doctor login · Medislot</title>
+  <title>Doctor login · Sharada Child Care, Hoskote</title>
+  <link rel="icon" href="images/logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
   <script src="config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 </head>
 <body data-page="doctor">
   <header>
-    <a class="brand" href="index.html">Medislot</a>
+    <a class="brand" href="index.html"><img src="images/logo.svg" alt="" width="32" height="32">Sharada Child Care</a>
     <nav>
       <a href="index.html">Book</a>
       <a href="doctor.html">Doctor login</a>
@@ -22,7 +23,8 @@
   </header>
 
   <main>
-    <section class="card" id="login">
+    <section class="card login-card" id="login">
+      <img class="card-art" src="images/doctor.svg" alt="" width="96" height="96">
       <h1>Doctor login</h1>
       <p class="sub">Enter your doctor name to see appointments.</p>
       <form id="login-form" novalidate>

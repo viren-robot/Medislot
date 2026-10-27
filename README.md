@@ -1,6 +1,8 @@
-# Medislot
+# Sharada Child Care, Hoskote
 
-A static website for booking doctor appointments, with a doctor login.
+A static website for booking appointments at Sharada Child Care, Hoskote, with a doctor login.
+
+Images are in `images/`: the logo (`logo.svg`, also the browser-tab icon), the welcome banner (`hero.svg`), and the doctor-login art (`doctor.svg`). To use real clinic photos, add them to `images/` and change the `src` in `index.html` or `doctor.html`.
 
 ## Files
 

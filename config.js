@@ -6,7 +6,7 @@ window.MEDISLOT_CONFIG = {
   supabaseUrl: "https://hpptnujyeczspdfxjopk.supabase.co",
   supabaseKey: "sb_publishable_pknzhhf-ow2nfuY3sALKfA_25GLhGAp",
 
-  clinicName: "Medislot",
+  clinicName: "Sharada Child Care, Hoskote",
   slotStart: "09:00",
   slotEnd: "17:00",
   slotMinutes: 30

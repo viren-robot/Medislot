@@ -6,6 +6,7 @@
   --line: #d9e1ea;
   --brand: #0f766e;
   --brand-dark: #115e59;
+  --on-brand: #ffffff;
   --danger: #b42318;
   --ok: #067647;
   --radius: 12px;
@@ -20,6 +21,7 @@
     --line: #2a3747;
     --brand: #2dd4bf;
     --brand-dark: #5eead4;
+    --on-brand: #0e1620;
   }
 }
 
@@ -44,7 +46,34 @@ header {
   border-bottom: 1px solid var(--line);
 }
 
-.brand { font-weight: 700; font-size: 1.25rem; color: var(--brand); text-decoration: none; }
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--brand);
+  text-decoration: none;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.hero h1 { font-size: 2rem; line-height: 1.2; margin-bottom: 8px; }
+.hero img { width: 100%; height: auto; display: block; }
+
+.login-card { max-width: 480px; margin-left: auto; margin-right: auto; text-align: center; }
+.login-card form { text-align: left; }
+.card-art { display: block; margin: 0 auto 12px; }
+
+@media (max-width: 700px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 1.6rem; }
+}
 
 nav a { color: var(--muted); margin-left: 16px; text-decoration: none; }
 nav a:hover { color: var(--brand); }
@@ -106,7 +135,7 @@ input:focus, select:focus, textarea:focus {
   border: none;
   border-radius: 8px;
   background: var(--brand);
-  color: #fff;
+  color: var(--on-brand);
   cursor: pointer;
   text-decoration: none;
 }

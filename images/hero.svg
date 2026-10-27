@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-labelledby="title">
+  <title id="title">A parent and child walking to a children's clinic</title>
+
+  <!-- sky and ground -->
+  <rect width="600" height="400" rx="24" fill="#e6f6f4"/>
+  <circle cx="510" cy="78" r="34" fill="#fcd34d"/>
+  <g fill="#ffffff">
+    <ellipse cx="120" cy="80" rx="46" ry="18"/>
+    <ellipse cx="150" cy="68" rx="30" ry="18"/>
+    <ellipse cx="380" cy="60" rx="40" ry="15"/>
+    <ellipse cx="405" cy="50" rx="24" ry="14"/>
+  </g>
+  <path d="M0 320 Q150 290 300 315 T600 305 V376 a24 24 0 0 1 -24 24 H24 a24 24 0 0 1 -24 -24Z" fill="#b7e4dc"/>
+
+  <!-- clinic -->
+  <rect x="310" y="170" width="220" height="150" rx="6" fill="#ffffff"/>
+  <path d="M296 176 L420 112 L544 176 Z" fill="#0f766e"/>
+  <circle cx="420" cy="150" r="18" fill="#ffffff"/>
+  <path d="M416 140h8v6h6v8h-6v6h-8v-6h-6v-8h6z" fill="#f97316"/>
+  <rect x="330" y="200" width="44" height="36" rx="4" fill="#bfe7f5"/>
+  <rect x="466" y="200" width="44" height="36" rx="4" fill="#bfe7f5"/>
+  <rect x="395" y="250" width="50" height="70" rx="4" fill="#0f766e"/>
+  <circle cx="436" cy="287" r="3" fill="#fcd34d"/>
+  <g fill="#5fb8a5">
+    <circle cx="302" cy="318" r="18"/>
+    <circle cx="546" cy="314" r="20"/>
+  </g>
+
+  <!-- parent -->
+  <rect x="158" y="290" width="10" height="42" rx="5" fill="#5b3a29"/>
+  <rect x="176" y="290" width="10" height="42" rx="5" fill="#5b3a29"/>
+  <path d="M146 214 Q172 200 198 214 L206 300 H138 Z" fill="#f97316"/>
+  <circle cx="172" cy="186" r="22" fill="#a86f4c"/>
+  <path d="M150 184 Q152 158 174 160 Q196 160 194 184 Q190 170 172 170 Q156 170 150 184Z" fill="#2d1b12"/>
+  <path d="M198 222 Q214 250 232 262" fill="none" stroke="#a86f4c" stroke-width="9" stroke-linecap="round"/>
+
+  <!-- child -->
+  <rect x="242" y="300" width="8" height="32" rx="4" fill="#1e3a5f"/>
+  <rect x="256" y="300" width="8" height="32" rx="4" fill="#1e3a5f"/>
+  <rect x="236" y="250" width="34" height="56" rx="12" fill="#38bdf8"/>
+  <circle cx="233" cy="262" r="5" fill="#a86f4c"/>
+  <circle cx="253" cy="232" r="17" fill="#a86f4c"/>
+  <path d="M237 230 Q238 212 253 213 Q269 213 269 230 Q264 221 253 221 Q242 221 237 230Z" fill="#2d1b12"/>
+  <path d="M268 262 Q282 250 290 236" fill="none" stroke="#a86f4c" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- heart balloon -->
+  <path d="M290 236 L300 172" stroke="#64748b" stroke-width="2"/>
+  <path d="M300 172 C284 160 282 150 288 145 c4-4 10-3 12 2 c2-5 8-6 12-2 c6 5 4 15 -12 27z" fill="#ef4444"/>
+</svg>

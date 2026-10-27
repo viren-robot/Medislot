@@ -3,14 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Book an appointment · Medislot</title>
+  <title>Book an appointment · Sharada Child Care, Hoskote</title>
+  <link rel="icon" href="images/logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
   <script src="config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 </head>
 <body data-page="booking">
   <header>
-    <a class="brand" href="index.html">Medislot</a>
+    <a class="brand" href="index.html"><img src="images/logo.svg" alt="" width="32" height="32">Sharada Child Care</a>
     <nav>
       <a href="index.html">Book</a>
       <a href="doctor.html">Doctor login</a>
@@ -18,8 +19,17 @@
   </header>
 
   <main>
-    <section class="card">
-      <h1>Book an appointment</h1>
+    <section class="hero">
+      <div class="hero-text">
+        <h1>Sharada Child Care, Hoskote</h1>
+        <p class="sub">Book your child's visit online. Pick a day and a free time slot, and we'll see you then.</p>
+        <a class="btn" href="#booking">Book an appointment</a>
+      </div>
+      <img src="images/hero.svg" alt="A parent and child walking to a children's clinic" width="600" height="400">
+    </section>
+
+    <section class="card" id="booking">
+      <h2>Book an appointment</h2>
       <p class="sub">Choose a day and a free time slot.</p>
 
       <form id="booking-form" novalidate>
