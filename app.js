@@ -215,13 +215,11 @@
     var dashboard = $("#dashboard");
     var authBar = $("#auth-bar");
     var authLabel = $("#auth-label");
-    var dateFilter = $("#filter-date");
     var list = $("#appt-list");
     var dashMsg = $("#dash-msg");
 
     var appointments = [];
     var code = null;
-    dateFilter.value = isoDate(new Date());
 
     function readCode() {
       try { return sessionStorage.getItem(CODE_KEY); } catch (err) { return null; }
@@ -297,15 +295,13 @@
       $("#stat-upcoming").textContent = active.filter(function (a) { return a.appt_date >= today; }).length;
       $("#stat-total").textContent = appointments.length;
 
-      var shown = appointments.filter(function (a) { return a.appt_date === dateFilter.value; });
-
       list.innerHTML = "";
-      if (!shown.length) {
-        list.appendChild(el("p", { className: "empty" }, ["No appointments for this selection."]));
+      if (!appointments.length) {
+        list.appendChild(el("p", { className: "empty" }, ["No bookings yet."]));
         return;
       }
 
-      shown.forEach(function (a) {
+      appointments.forEach(function (a) {
         var time = a.appt_time.slice(0, 5);
         var kids = (a.children || []).map(function (c) {
           return c.name + " (" + c.age + (c.age === 1 ? " yr" : " yrs") + ")";
@@ -343,7 +339,6 @@
     });
 
     $("#signout").addEventListener("click", function () { showLoggedOut(); });
-    dateFilter.addEventListener("change", render);
 
     // Re-read bookings every 10 seconds while a doctor is logged in.
     setInterval(function () {
