@@ -349,6 +349,11 @@
     dateFilter.addEventListener("change", render);
     showAll.addEventListener("change", render);
 
+    // Re-read bookings every 10 seconds while a doctor is logged in.
+    setInterval(function () {
+      if (code && !dashboard.hidden) loadAppointments();
+    }, 10000);
+
     var saved = readCode();
     if (saved) login(saved);
     else showLoggedOut();
