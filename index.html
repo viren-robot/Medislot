@@ -84,7 +84,7 @@
 
     <section class="card" id="booking">
       <h2>Book an appointment</h2>
-      <p class="sub">Choose a day and a free time slot.</p>
+      <p class="sub">Only your name is required. Add the other details if you can, so we can reach you and prepare for the visit.</p>
 
       <form id="booking-form" novalidate>
         <div class="grid">
@@ -93,24 +93,24 @@
             <input id="name" name="name" autocomplete="name" required>
           </div>
           <div>
-            <label for="email">Email *</label>
-            <input id="email" name="email" type="email" autocomplete="email" required>
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email">
           </div>
           <div>
-            <label for="phone">Phone *</label>
-            <input id="phone" name="phone" type="tel" autocomplete="tel" required>
+            <label for="phone">Phone</label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel">
           </div>
           <div>
-            <label for="date">Date *</label>
-            <input id="date" name="date" type="date" required>
+            <label for="date">Date</label>
+            <input id="date" name="date" type="date">
           </div>
           <div>
-            <label for="time">Time *</label>
-            <select id="time" name="time" required></select>
+            <label for="time">Time</label>
+            <select id="time" name="time"></select>
           </div>
           <div>
-            <label for="visit">Reason for visit *</label>
-            <select id="visit" name="visit" required>
+            <label for="visit">Reason for visit</label>
+            <select id="visit" name="visit">
               <option value="">Select a reason</option>
               <option>Vaccination</option>
               <option>Consultation</option>
@@ -120,7 +120,7 @@
             </select>
           </div>
           <div class="full">
-            <span class="label-text">Child details *</span>
+            <span class="label-text">Child details</span>
             <div id="children"></div>
             <button class="btn secondary small" id="add-child" type="button">+ Add another child</button>
           </div>

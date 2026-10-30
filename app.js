@@ -123,7 +123,9 @@
     function takenTimes(day) {
       return db.from("appointments").select("appt_time").eq("appt_date", day).then(function (res) {
         if (res.error) throw res.error;
-        return res.data.map(function (r) { return r.appt_time.slice(0, 5); });
+        return res.data
+          .filter(function (r) { return r.appt_time; })
+          .map(function (r) { return r.appt_time.slice(0, 5); });
       });
     }
 
@@ -167,33 +169,38 @@
         time: timeEl.value,
         visit: visitEl.value
       };
-      var children = readChildren();
+      // Only the parent's name is required. Empty child rows are skipped.
+      var children = readChildren().filter(function (c) { return c.name || c.age !== ""; });
 
-      if (!data.name || !data.email || !data.phone || !data.date || !data.time || !data.visit) {
-        return showMsg(msg, "Please fill in all required fields and pick a time.", "error");
+      if (!data.name) {
+        return showMsg(msg, "Please enter the parent's name.", "error");
       }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-        return showMsg(msg, "Please enter a valid email address.", "error");
+      if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+        return showMsg(msg, "Please check the email address, or leave it blank.", "error");
       }
-      if (!children.length) {
-        return showMsg(msg, "Please add at least one child.", "error");
+      if (data.phone && data.phone.length < 3) {
+        return showMsg(msg, "Please check the phone number, or leave it blank.", "error");
       }
-      var badChild = children.some(function (c) {
-        return !c.name || c.age === "" || Number(c.age) < 0 || Number(c.age) > MAX_AGE || Math.floor(Number(c.age)) !== Number(c.age);
+      var badAge = children.some(function (c) {
+        return c.age !== "" && (Number(c.age) < 0 || Number(c.age) > MAX_AGE || Math.floor(Number(c.age)) !== Number(c.age));
       });
-      if (badChild) {
-        return showMsg(msg, "Please give every child a name and an age in whole years (0 to " + MAX_AGE + ").", "error");
+      if (badAge) {
+        return showMsg(msg, "Please give ages in whole years (0 to " + MAX_AGE + "), or leave them blank.", "error");
       }
+
+      // A time without a date can't be booked, so it is dropped.
+      var date = data.date || null;
+      var time = date && data.time ? data.time : null;
 
       submit.disabled = true;
       db.from("appointments").insert({
         patient_name: data.name,
-        patient_email: data.email,
-        patient_phone: data.phone,
-        children: children.map(function (c) { return { name: c.name, age: Number(c.age) }; }),
+        patient_email: data.email || null,
+        patient_phone: data.phone || null,
+        children: children.map(function (c) { return { name: c.name, age: c.age === "" ? null : Number(c.age) }; }),
         reason: data.visit,
-        appt_date: data.date,
-        appt_time: data.time + ":00",
+        appt_date: date,
+        appt_time: time ? time + ":00" : null,
         status: "booked"
       }).then(function (res) {
         submit.disabled = false;
@@ -211,7 +218,10 @@
         addChildRow();
         dateEl.value = nextOpenDay();
         refreshTimes();
-        showMsg(msg, "Booked! " + formatDate(data.date) + " at " + formatTime(data.time) + ".", "ok");
+        var when = date && time ? formatDate(date) + " at " + formatTime(time)
+          : date ? formatDate(date) + ". The clinic will confirm a time"
+          : "No date chosen yet. The clinic will contact you to arrange one";
+        showMsg(msg, "Booked! " + when + ".", "ok");
       });
     });
 
@@ -319,10 +329,13 @@
       }
 
       appointments.forEach(function (a) {
-        var time = a.appt_time.slice(0, 5);
+        var timeLabel = a.appt_time ? formatTime(a.appt_time.slice(0, 5)) : "No time";
         var kids = (a.children || []).map(function (c) {
-          return c.name + " (" + c.age + (c.age === 1 ? " yr" : " yrs") + ")";
+          var age = c.age === null || c.age === undefined ? "" : " (" + c.age + (c.age === 1 ? " yr" : " yrs") + ")";
+          return (c.name || "Name not given") + age;
         }).join(", ");
+        var meta = [a.appt_date ? formatDate(a.appt_date) : "No date", a.patient_phone, a.patient_email]
+          .filter(Boolean).join(" · ");
         var actions = el("div", { className: "row-actions" });
         if (a.status === "booked") {
           actions.appendChild(el("button", { className: "btn small", onclick: function () { changeAppt(a.id, { status: "done" }); } }, ["Mark done"]));
@@ -335,10 +348,10 @@
         } }, ["Delete"]));
 
         list.appendChild(el("div", { className: "appt" }, [
-          el("div", { className: "time" }, [formatTime(time)]),
+          el("div", { className: "time" }, [timeLabel]),
           el("div", {}, [
             el("div", {}, [el("strong", {}, [a.patient_name]), el("span", { className: "pill " + a.status }, [a.status])]),
-            el("div", { className: "meta" }, [formatDate(a.appt_date) + " · " + a.patient_phone + " · " + a.patient_email]),
+            el("div", { className: "meta" }, [meta]),
             el("div", { className: "kids" }, ["Child: " + (kids || "not given")]),
             el("div", { className: "reason" }, [a.reason || "No reason given"])
           ]),
