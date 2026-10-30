@@ -76,6 +76,7 @@ header {
 .details dt { font-weight: 600; font-size: 0.85rem; color: var(--muted); }
 .details dd { margin: 0 0 12px; }
 .details dd:last-child { margin-bottom: 0; }
+.details a { color: var(--brand); }
 @media (max-width: 700px) {
   .about { grid-template-columns: 1fr; }
 }
