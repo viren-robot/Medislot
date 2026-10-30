@@ -14,5 +14,5 @@ window.MEDISLOT_CONFIG = {
   ],
   // Days with no bookings: 0 = Sunday, 6 = Saturday.
   closedDays: [0],
-  slotMinutes: 30
+  slotMinutes: 20
 };
