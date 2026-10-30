@@ -216,7 +216,6 @@
     var authBar = $("#auth-bar");
     var authLabel = $("#auth-label");
     var dateFilter = $("#filter-date");
-    var showAll = $("#show-all");
     var list = $("#appt-list");
     var dashMsg = $("#dash-msg");
 
@@ -298,9 +297,7 @@
       $("#stat-upcoming").textContent = active.filter(function (a) { return a.appt_date >= today; }).length;
       $("#stat-total").textContent = appointments.length;
 
-      var shown = showAll.checked
-        ? appointments
-        : appointments.filter(function (a) { return a.appt_date === dateFilter.value; });
+      var shown = appointments.filter(function (a) { return a.appt_date === dateFilter.value; });
 
       list.innerHTML = "";
       if (!shown.length) {
@@ -347,7 +344,6 @@
 
     $("#signout").addEventListener("click", function () { showLoggedOut(); });
     dateFilter.addEventListener("change", render);
-    showAll.addEventListener("change", render);
 
     // Re-read bookings every 10 seconds while a doctor is logged in.
     setInterval(function () {
