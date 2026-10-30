@@ -66,6 +66,20 @@ header {
 .hero h1 { font-size: 2rem; line-height: 1.2; margin-bottom: 8px; }
 .hero img { width: 100%; height: auto; display: block; }
 
+.about {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 24px;
+}
+.about p { margin: 0 0 12px; }
+.details { margin: 0; padding: 16px; background: var(--bg); border-radius: 8px; }
+.details dt { font-weight: 600; font-size: 0.85rem; color: var(--muted); }
+.details dd { margin: 0 0 12px; }
+.details dd:last-child { margin-bottom: 0; }
+@media (max-width: 700px) {
+  .about { grid-template-columns: 1fr; }
+}
+
 .label-text { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 4px; }
 .child-row {
   display: grid;
