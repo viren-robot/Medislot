@@ -7,7 +7,12 @@ window.MEDISLOT_CONFIG = {
   supabaseKey: "sb_publishable_pknzhhf-ow2nfuY3sALKfA_25GLhGAp",
 
   clinicName: "Sharada Child Care, Hoskote",
-  slotStart: "09:00",
-  slotEnd: "17:00",
+  // Clinic sessions (24-hour clock). Slots start every slotMinutes inside each session.
+  sessions: [
+    { start: "10:00", end: "14:00" },
+    { start: "17:00", end: "19:00" }
+  ],
+  // Days with no bookings: 0 = Sunday, 6 = Saturday.
+  closedDays: [0],
   slotMinutes: 30
 };

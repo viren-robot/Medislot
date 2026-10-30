@@ -46,12 +46,25 @@
 
   function timeSlots() {
     var out = [];
-    var s = cfg.slotStart.split(":").map(Number);
-    var e = cfg.slotEnd.split(":").map(Number);
-    for (var t = s[0] * 60 + s[1]; t < e[0] * 60 + e[1]; t += cfg.slotMinutes) {
-      out.push(String(Math.floor(t / 60)).padStart(2, "0") + ":" + String(t % 60).padStart(2, "0"));
-    }
+    cfg.sessions.forEach(function (session) {
+      var s = session.start.split(":").map(Number);
+      var e = session.end.split(":").map(Number);
+      for (var t = s[0] * 60 + s[1]; t < e[0] * 60 + e[1]; t += cfg.slotMinutes) {
+        out.push(String(Math.floor(t / 60)).padStart(2, "0") + ":" + String(t % 60).padStart(2, "0"));
+      }
+    });
     return out;
+  }
+
+  function isClosedDay(iso) {
+    return cfg.closedDays.indexOf(new Date(iso + "T00:00:00").getDay()) !== -1;
+  }
+
+  // Today, or the next day the clinic is open.
+  function nextOpenDay() {
+    var d = new Date();
+    while (isClosedDay(isoDate(d))) d.setDate(d.getDate() + 1);
+    return isoDate(d);
   }
 
   function showMsg(node, text, kind) {
@@ -75,9 +88,8 @@
     var msg = $("#booking-msg");
     var submit = form.querySelector("button[type=submit]");
 
-    var today = new Date();
-    dateEl.min = isoDate(today);
-    dateEl.value = isoDate(today);
+    dateEl.min = isoDate(new Date());
+    dateEl.value = nextOpenDay();
 
     // Each child is a name and an age in years. The first row is always there.
     function addChildRow() {
@@ -119,6 +131,11 @@
       var day = dateEl.value;
       var previous = timeEl.value;
       if (!day) return Promise.resolve();
+      if (isClosedDay(day)) {
+        timeEl.innerHTML = "";
+        timeEl.appendChild(el("option", { value: "" }, ["Closed on Sundays"]));
+        return Promise.resolve();
+      }
       return takenTimes(day).then(function (taken) {
         var isToday = day === isoDate(new Date());
         var now = nowHHMM();
@@ -192,7 +209,7 @@
         childrenEl.innerHTML = "";
         addChildBtn.disabled = false;
         addChildRow();
-        dateEl.value = isoDate(new Date());
+        dateEl.value = nextOpenDay();
         refreshTimes();
         showMsg(msg, "Booked! " + formatDate(data.date) + " at " + formatTime(data.time) + ".", "ok");
       });
