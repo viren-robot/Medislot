@@ -6,6 +6,8 @@
 
   var STRINGS = {
     en: {
+      photo_building_alt: "The clinic building on TG Badavane 2nd Main Road, Hoskote",
+      photo_room_alt: "The consulting room, with the doctor's desk and an examination bed",
       meta_title: "Sharada Child Care, Hoskote | Book an appointment",
       brand: "Sharada Child Care",
       nav_book: "Book",
@@ -23,13 +25,10 @@
       sum_sub: "What we offer at the clinic. When you book, choose one of these as the reason for your visit.",
       vacc: "Vaccination",
       vacc_p: "Routine childhood vaccinations on schedule, from birth onwards. Please bring your child's vaccination card to every visit.",
-      vacc_alt: "A child on their mother's lap being given a vaccine",
       cons: "Consultation",
       cons_p: "Check-ups and treatment for fever, cough and cold, stomach upsets, rashes and other common childhood illnesses, with advice on feeding and growth.",
-      cons_alt: "A doctor listening to a young child's chest with a stethoscope",
       obs: "Observation",
       obs_p: "Short stays under the doctor's care, under 6 hours or longer, when a child needs to be watched closely or treated before going home.",
-      obs_alt: "A health worker with mothers and a baby in a clinic ward",
       ear: "Ear piercing",
       ear_p: "Clean, careful ear piercing for children, with advice on aftercare.",
       obs_short: "Observation (less than 6 hrs)",
@@ -75,11 +74,12 @@
       ok: "Booked! {when}.",
       when_full: "{date} at {time}",
       when_date: "{date}. The clinic will confirm a time",
-      when_none: "No date chosen yet. The clinic will contact you to arrange one",
-      credits: "Illustrative photos"
+      when_none: "No date chosen yet. The clinic will contact you to arrange one"
     },
 
     kn: {
+      photo_building_alt: "ಹೊಸಕೋಟೆಯ ಟಿಜಿ ಬಡಾವಣೆ 2ನೇ ಮುಖ್ಯ ರಸ್ತೆಯಲ್ಲಿರುವ ಕ್ಲಿನಿಕ್ ಕಟ್ಟಡ",
+      photo_room_alt: "ವೈದ್ಯರ ಮೇಜು ಮತ್ತು ಪರೀಕ್ಷಾ ಹಾಸಿಗೆ ಇರುವ ಸಮಾಲೋಚನಾ ಕೊಠಡಿ",
       meta_title: "ಶಾರದಾ ಚೈಲ್ಡ್ ಕೇರ್, ಹೊಸಕೋಟೆ | ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಬುಕ್ ಮಾಡಿ",
       brand: "ಶಾರದಾ ಚೈಲ್ಡ್ ಕೇರ್",
       nav_book: "ಬುಕ್ ಮಾಡಿ",
@@ -97,13 +97,10 @@
       sum_sub: "ಕ್ಲಿನಿಕ್‌ನಲ್ಲಿ ನಾವು ನೀಡುವ ಸೇವೆಗಳು. ಬುಕ್ ಮಾಡುವಾಗ ಇವುಗಳಲ್ಲಿ ಒಂದನ್ನು ಭೇಟಿಯ ಕಾರಣವಾಗಿ ಆರಿಸಿ.",
       vacc: "ಲಸಿಕೆ",
       vacc_p: "ಹುಟ್ಟಿನಿಂದಲೇ ವೇಳಾಪಟ್ಟಿಯಂತೆ ಮಕ್ಕಳ ನಿಯಮಿತ ಲಸಿಕೆಗಳು. ಪ್ರತಿ ಭೇಟಿಗೂ ನಿಮ್ಮ ಮಗುವಿನ ಲಸಿಕೆ ಕಾರ್ಡ್ ತನ್ನಿ.",
-      vacc_alt: "ತಾಯಿಯ ತೊಡೆಯ ಮೇಲೆ ಕುಳಿತ ಮಗುವಿಗೆ ಲಸಿಕೆ ನೀಡಲಾಗುತ್ತಿದೆ",
       cons: "ಸಮಾಲೋಚನೆ",
       cons_p: "ಜ್ವರ, ಕೆಮ್ಮು ಮತ್ತು ನೆಗಡಿ, ಹೊಟ್ಟೆಯ ತೊಂದರೆಗಳು, ಚರ್ಮದ ದದ್ದುಗಳು ಮತ್ತು ಮಕ್ಕಳ ಇತರ ಸಾಮಾನ್ಯ ಕಾಯಿಲೆಗಳಿಗೆ ತಪಾಸಣೆ ಮತ್ತು ಚಿಕಿತ್ಸೆ, ಜೊತೆಗೆ ಆಹಾರ ಮತ್ತು ಬೆಳವಣಿಗೆಯ ಬಗ್ಗೆ ಸಲಹೆ.",
-      cons_alt: "ವೈದ್ಯರು ಸ್ಟೆತೊಸ್ಕೋಪ್‌ನಿಂದ ಚಿಕ್ಕ ಮಗುವಿನ ಎದೆಯನ್ನು ಪರೀಕ್ಷಿಸುತ್ತಿರುವುದು",
       obs: "ನಿಗಾ (ಅಬ್ಸರ್ವೇಶನ್)",
       obs_p: "ಮಗುವನ್ನು ಹತ್ತಿರದಿಂದ ಗಮನಿಸಬೇಕಾದಾಗ ಅಥವಾ ಮನೆಗೆ ಹೋಗುವ ಮೊದಲು ಚಿಕಿತ್ಸೆ ನೀಡಬೇಕಾದಾಗ, ವೈದ್ಯರ ನಿಗಾದಲ್ಲಿ 6 ಗಂಟೆಗಿಂತ ಕಡಿಮೆ ಅಥವಾ ಹೆಚ್ಚು ಸಮಯದ ವಾಸ್ತವ್ಯ.",
-      obs_alt: "ಕ್ಲಿನಿಕ್‌ನ ವಾರ್ಡ್‌ನಲ್ಲಿ ತಾಯಂದಿರು ಮತ್ತು ಮಗುವಿನೊಂದಿಗೆ ಆರೋಗ್ಯ ಕಾರ್ಯಕರ್ತೆ",
       ear: "ಕಿವಿ ಚುಚ್ಚುವುದು",
       ear_p: "ಮಕ್ಕಳಿಗೆ ಸ್ವಚ್ಛ ಮತ್ತು ಎಚ್ಚರಿಕೆಯ ಕಿವಿ ಚುಚ್ಚುವಿಕೆ, ನಂತರದ ಆರೈಕೆಯ ಸಲಹೆಯೊಂದಿಗೆ.",
       obs_short: "ನಿಗಾ (6 ಗಂಟೆಗಿಂತ ಕಡಿಮೆ)",
@@ -149,11 +146,12 @@
       ok: "ಬುಕ್ ಆಗಿದೆ! {when}.",
       when_full: "{date}, {time}",
       when_date: "{date}. ಕ್ಲಿನಿಕ್ ಸಮಯವನ್ನು ಖಚಿತಪಡಿಸುತ್ತದೆ",
-      when_none: "ಇನ್ನೂ ದಿನಾಂಕ ಆರಿಸಿಲ್ಲ. ಸಮಯ ನಿಗದಿಪಡಿಸಲು ಕ್ಲಿನಿಕ್ ನಿಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸುತ್ತದೆ",
-      credits: "ಮಾದರಿ ಫೋಟೋಗಳು"
+      when_none: "ಇನ್ನೂ ದಿನಾಂಕ ಆರಿಸಿಲ್ಲ. ಸಮಯ ನಿಗದಿಪಡಿಸಲು ಕ್ಲಿನಿಕ್ ನಿಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸುತ್ತದೆ"
     },
 
     te: {
+      photo_building_alt: "హోసకోటే, టీజీ బడావణే 2వ మెయిన్ రోడ్డులోని క్లినిక్ భవనం",
+      photo_room_alt: "డాక్టర్ టేబుల్ మరియు పరీక్ష మంచం ఉన్న కన్సల్టింగ్ గది",
       meta_title: "శారదా చైల్డ్ కేర్, హోసకోటే | అపాయింట్‌మెంట్ బుక్ చేయండి",
       brand: "శారదా చైల్డ్ కేర్",
       nav_book: "బుక్ చేయండి",
@@ -171,13 +169,10 @@
       sum_sub: "క్లినిక్‌లో మేము అందించే సేవలు. బుక్ చేసేటప్పుడు వీటిలో ఒకదాన్ని మీ సందర్శన కారణంగా ఎంచుకోండి.",
       vacc: "టీకా",
       vacc_p: "పుట్టినప్పటి నుండి షెడ్యూల్ ప్రకారం పిల్లలకు సాధారణ టీకాలు. ప్రతి సందర్శనకు మీ పిల్లల టీకా కార్డును తీసుకురండి.",
-      vacc_alt: "తల్లి ఒడిలో కూర్చున్న పిల్లవాడికి టీకా వేస్తున్నారు",
       cons: "సంప్రదింపు",
       cons_p: "జ్వరం, దగ్గు మరియు జలుబు, కడుపు సమస్యలు, చర్మంపై దద్దుర్లు మరియు ఇతర సాధారణ బాల్య వ్యాధులకు పరీక్ష మరియు చికిత్స, అలాగే ఆహారం మరియు ఎదుగుదలపై సలహా.",
-      cons_alt: "స్టెతస్కోప్‌తో చిన్న పిల్లవాడి ఛాతీని పరీక్షిస్తున్న డాక్టర్",
       obs: "పరిశీలన (అబ్జర్వేషన్)",
       obs_p: "పిల్లవాడిని దగ్గరగా గమనించాల్సినప్పుడు లేదా ఇంటికి వెళ్లే ముందు చికిత్స అవసరమైనప్పుడు, డాక్టర్ పర్యవేక్షణలో 6 గంటల కంటే తక్కువ లేదా ఎక్కువ సమయం ఉండటం.",
-      obs_alt: "క్లినిక్ వార్డులో తల్లులు మరియు శిశువుతో ఆరోగ్య కార్యకర్త",
       ear: "చెవులు కుట్టడం",
       ear_p: "పిల్లలకు శుభ్రంగా, జాగ్రత్తగా చెవులు కుట్టడం, తర్వాతి సంరక్షణపై సలహాతో.",
       obs_short: "పరిశీలన (6 గంటల కంటే తక్కువ)",
@@ -223,11 +218,12 @@
       ok: "బుక్ అయింది! {when}.",
       when_full: "{date}, {time}",
       when_date: "{date}. క్లినిక్ సమయాన్ని నిర్ధారిస్తుంది",
-      when_none: "ఇంకా తేదీ ఎంచుకోలేదు. సమయం నిర్ణయించడానికి క్లినిక్ మిమ్మల్ని సంప్రదిస్తుంది",
-      credits: "నమూనా ఫోటోలు"
+      when_none: "ఇంకా తేదీ ఎంచుకోలేదు. సమయం నిర్ణయించడానికి క్లినిక్ మిమ్మల్ని సంప్రదిస్తుంది"
     },
 
     ur: {
+      photo_building_alt: "ہوسکوٹے میں ٹی جی بڈاونے سیکنڈ مین روڈ پر کلینک کی عمارت",
+      photo_room_alt: "مشاورت کا کمرہ، جس میں ڈاکٹر کی میز اور معائنے کا بستر ہے",
       meta_title: "شاردا چائلڈ کیئر، ہوسکوٹے | اپائنٹمنٹ بک کریں",
       brand: "شاردا چائلڈ کیئر",
       nav_book: "بک کریں",
@@ -245,13 +241,10 @@
       sum_sub: "کلینک میں ہماری خدمات۔ بک کرتے وقت ان میں سے ایک کو اپنی ملاقات کی وجہ کے طور پر چنیں۔",
       vacc: "ٹیکہ کاری",
       vacc_p: "پیدائش سے ہی شیڈول کے مطابق بچوں کے معمول کے ٹیکے۔ ہر ملاقات پر اپنے بچے کا ٹیکہ کارڈ ساتھ لائیں۔",
-      vacc_alt: "ماں کی گود میں بیٹھے بچے کو ٹیکہ لگایا جا رہا ہے",
       cons: "مشاورت",
       cons_p: "بخار، کھانسی اور زکام، پیٹ کی خرابی، دانے اور بچپن کی دیگر عام بیماریوں کا معائنہ اور علاج، ساتھ ہی خوراک اور نشوونما کے بارے میں مشورہ۔",
-      cons_alt: "ڈاکٹر اسٹیتھوسکوپ سے ایک چھوٹے بچے کا سینہ چیک کر رہی ہیں",
       obs: "نگرانی (آبزرویشن)",
       obs_p: "جب بچے پر قریب سے نظر رکھنی ہو یا گھر جانے سے پہلے علاج کی ضرورت ہو، تو ڈاکٹر کی نگرانی میں 6 گھنٹے سے کم یا زیادہ قیام۔",
-      obs_alt: "کلینک کے وارڈ میں ماؤں اور ایک بچے کے ساتھ ہیلتھ ورکر",
       ear: "کان چھیدنا",
       ear_p: "بچوں کے لیے صاف ستھرا اور احتیاط سے کان چھیدنا، بعد کی دیکھ بھال کے مشورے کے ساتھ۔",
       obs_short: "نگرانی (6 گھنٹے سے کم)",
@@ -297,8 +290,7 @@
       ok: "بک ہو گیا! {when}۔",
       when_full: "{date}، {time}",
       when_date: "{date}۔ کلینک وقت کی تصدیق کرے گا",
-      when_none: "ابھی کوئی تاریخ نہیں چنی گئی۔ وقت طے کرنے کے لیے کلینک آپ سے رابطہ کرے گا",
-      credits: "تمثیلی تصاویر"
+      when_none: "ابھی کوئی تاریخ نہیں چنی گئی۔ وقت طے کرنے کے لیے کلینک آپ سے رابطہ کرے گا"
     }
   };
 

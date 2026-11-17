@@ -2,7 +2,7 @@
 
 A static website for booking appointments at Sharada Child Care, Hoskote, with a doctor login.
 
-Images are in `images/`: the logo (`logo.svg`, also the browser-tab icon), the welcome banner (`hero.svg`), and the doctor-login art (`doctor.svg`). The service photos in the clinical summary (`vaccination.jpg`, `checkup.jpg`, `care.jpg`) are openly licensed stock photos, credited in the page footer, not photos of this clinic; replace them with your own when you can, and remove their credits from the footer. To use real clinic photos, add them to `images/` and change the `src` in `index.html` or `doctor.html`.
+Images are in `images/`: the logo (`logo.svg`, also the browser-tab icon), the welcome banner (`hero.svg`), and the doctor-login art (`doctor.svg`). The introduction shows the clinic's own photos: the building (`clinic-building.jpg`) and the consulting room (`clinic-room.jpg`). The clinical summary cards use small drawn icons. To use real clinic photos, add them to `images/` and change the `src` in `index.html` or `doctor.html`.
 
 ## Files
 

@@ -243,7 +243,7 @@ input:focus, select:focus, textarea:focus {
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 .service { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
-.service img, .service .art { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; }
+.service .art { display: block; width: 100%; height: auto; aspect-ratio: 3 / 1; }
 .service .art { background: var(--tint); color: var(--brand); }
 .service h3 { font-size: 1.05rem; margin: 12px 14px 4px; }
 .service p { margin: 0 14px 14px; color: var(--muted); font-size: 0.95rem; }
@@ -255,10 +255,17 @@ input:focus, select:focus, textarea:focus {
 .emergency strong { color: var(--danger); }
 .emergency p { margin: 4px 0 0; }
 
-footer { max-width: 880px; margin: 0 auto 32px; padding: 0 16px; color: var(--muted); font-size: 0.8rem; }
-footer a { color: inherit; }
 
 /* ---------- Urdu ---------- */
 html[lang="ur"] body { font-family: "Noto Nastaliq Urdu", "Noto Naskh Arabic", serif; line-height: 2.1; }
 html[lang="ur"] h1, html[lang="ur"] h2, html[lang="ur"] h3 { line-height: 1.9; }
 html[lang="ur"] .lang-switch button:not([lang="ur"]) { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Kannada", "Noto Sans Telugu", sans-serif; }
+
+/* Clinic photos: column widths follow each photo's shape, so both show at the same height. */
+.clinic-photos {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 217fr 515fr;
+  gap: 12px;
+}
+.clinic-photos img { display: block; width: 100%; height: auto; border-radius: 8px; }
