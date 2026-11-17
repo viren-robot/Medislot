@@ -37,102 +37,155 @@
     "medicalSpecialty": "Pediatric"
   }
   </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Noto+Sans+Kannada:wght@400;600;700&family=Noto+Sans+Telugu:wght@400;600;700&display=swap">
   <link rel="stylesheet" href="styles.css">
   <script src="config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="i18n.js"></script>
 </head>
 <body data-page="booking">
   <header>
-    <a class="brand" href="index.html"><img src="images/logo.svg" alt="" width="32" height="32">Sharada Child Care</a>
+    <a class="brand" href="index.html"><img src="images/logo.svg" alt="" width="32" height="32"><span data-i18n="brand">Sharada Child Care</span></a>
     <nav>
-      <a href="index.html">Book</a>
-      <a href="doctor.html">Doctor login</a>
+      <a href="index.html" data-i18n="nav_book">Book</a>
+      <a href="doctor.html" data-i18n="nav_doctor">Doctor login</a>
     </nav>
+    <div class="lang-switch" role="group" aria-label="Language" data-i18n-aria="lang_label">
+      <button type="button" data-lang="en" lang="en" aria-pressed="true">English</button>
+      <button type="button" data-lang="kn" lang="kn" aria-pressed="false">ಕನ್ನಡ</button>
+      <button type="button" data-lang="te" lang="te" aria-pressed="false">తెలుగు</button>
+      <button type="button" data-lang="ur" lang="ur" aria-pressed="false">اردو</button>
+    </div>
   </header>
 
   <main>
     <section class="hero">
       <div class="hero-text">
-        <h1>Sharada Child Care, Hoskote</h1>
-        <p class="sub">Book your child's visit online. Pick a day and a free time slot, and we'll see you then.</p>
-        <a class="btn" href="#booking">Book an appointment</a>
+        <h1 data-i18n="hero_title">Sharada Child Care, Hoskote</h1>
+        <p class="sub" data-i18n="hero_sub">Book your child's visit online. Pick a day and a free time slot, and we'll see you then.</p>
+        <a class="btn" href="#booking" data-i18n="hero_cta">Book an appointment</a>
       </div>
-      <img src="images/hero.svg" alt="A parent and child walking to a children's clinic" width="600" height="400">
+      <img src="images/hero.svg" alt="A parent and child walking to a children's clinic" data-i18n-alt="hero_alt" width="600" height="400">
     </section>
 
     <section class="card about" id="about">
       <div>
-        <h2>About the clinic</h2>
-        <p>Sharada Child Care is run by Dr Veenadevi S, a paediatric specialist caring for children's health and wellbeing in Hoskote.</p>
-        <p>We offer vaccinations, consultations, ear piercing, and observation for children, for stays of up to six hours and beyond. Book your child's visit online by choosing a day, a free time slot, and the reason for the visit.</p>
-        <p>We aim to make every visit calm and reassuring, for the child and for the parent.</p>
+        <h2 data-i18n="intro_h">Introduction</h2>
+        <p data-i18n="intro_p1">Welcome to Sharada Child Care, a children's clinic in Hoskote run by paediatrician Dr Veenadevi S, MBBS, MD.</p>
+        <p data-i18n="intro_p2">We look after children from newborns to teenagers: vaccinations, check-ups, treatment for common illnesses, and advice for parents on feeding, growth and development.</p>
+        <p data-i18n="intro_p3">We aim to make every visit calm and reassuring, for the child and for the parent.</p>
       </div>
       <dl class="details">
-        <dt>Doctor</dt>
-        <dd>Dr Veenadevi S, MBBS, MD Paediatrician</dd>
-        <dt>Address</dt>
-        <dd>TG Badavane 2nd Main Rd, Kammavari Pete, Hoskote, Karnataka 562114<br>
-          <a href="https://www.google.com/maps/search/?api=1&amp;query=Sharada+Child+Care+Hoskote" target="_blank" rel="noopener">Get directions</a></dd>
-        <dt>Phone</dt>
-        <dd><a href="tel:+917406040066">+91 74060 40066</a></dd>
-        <dt>Hours</dt>
-        <dd>Monday to Saturday: 10:00 AM – 2:00 PM and 5:00 PM – 7:00 PM<br>Sunday: closed</dd>
-        <dt>Services</dt>
-        <dd>Vaccination · Consultation · Ear piercing · Observation (less than 6 hrs) · Observation (more than 6 hrs)</dd>
+        <dt data-i18n="det_doctor">Doctor</dt>
+        <dd data-i18n="det_doctor_v">Dr Veenadevi S, MBBS, MD Paediatrician</dd>
+        <dt data-i18n="det_address">Address</dt>
+        <dd><span dir="ltr">TG Badavane 2nd Main Rd, Kammavari Pete, Hoskote, Karnataka 562114</span><br>
+          <a href="https://www.google.com/maps/search/?api=1&amp;query=Sharada+Child+Care+Hoskote" target="_blank" rel="noopener" data-i18n="det_directions">Get directions</a></dd>
+        <dt data-i18n="det_phone">Phone</dt>
+        <dd><a href="tel:+917406040066" dir="ltr">+91 74060 40066</a></dd>
+        <dt data-i18n="det_hours">Hours</dt>
+        <dd><span data-i18n="hours1">Monday to Saturday: 10:00 AM – 2:00 PM and 5:00 PM – 7:00 PM</span><br><span data-i18n="hours2">Sunday: closed</span></dd>
+        <dt data-i18n="det_services">Services</dt>
+        <dd data-i18n="services_list">Vaccination · Consultation · Ear piercing · Observation (less than 6 hrs) · Observation (more than 6 hrs)</dd>
       </dl>
     </section>
 
+    <section class="card" id="summary">
+      <h2 data-i18n="sum_h">Clinical summary</h2>
+      <p class="sub" data-i18n="sum_sub">What we offer at the clinic. When you book, choose one of these as the reason for your visit.</p>
+      <div class="services">
+        <article class="service">
+          <img src="images/vaccination.jpg" alt="A child on their mother's lap being given a vaccine" data-i18n-alt="vacc_alt" width="600" height="400" loading="lazy">
+          <h3 data-i18n="vacc">Vaccination</h3>
+          <p data-i18n="vacc_p">Routine childhood vaccinations on schedule, from birth onwards. Please bring your child's vaccination card to every visit.</p>
+        </article>
+        <article class="service">
+          <img src="images/checkup.jpg" alt="A doctor listening to a young child's chest with a stethoscope" data-i18n-alt="cons_alt" width="600" height="400" loading="lazy">
+          <h3 data-i18n="cons">Consultation</h3>
+          <p data-i18n="cons_p">Check-ups and treatment for fever, cough and cold, stomach upsets, rashes and other common childhood illnesses, with advice on feeding and growth.</p>
+        </article>
+        <article class="service">
+          <img src="images/care.jpg" alt="A health worker with mothers and a baby in a clinic ward" data-i18n-alt="obs_alt" width="600" height="400" loading="lazy">
+          <h3 data-i18n="obs">Observation</h3>
+          <p data-i18n="obs_p">Short stays under the doctor's care, under 6 hours or longer, when a child needs to be watched closely or treated before going home.</p>
+        </article>
+        <article class="service">
+          <svg class="art" viewBox="0 0 600 400" role="img" aria-hidden="true">
+            <circle cx="300" cy="215" r="70" fill="none" stroke="currentColor" stroke-width="14"/>
+            <circle cx="300" cy="138" r="18" fill="currentColor"/>
+            <path d="M300 255 l14 24 -14 24 -14 -24z" fill="currentColor"/>
+            <path d="M410 120 l6 16 16 6 -16 6 -6 16 -6 -16 -16 -6 16 -6z M200 270 l4 11 11 4 -11 4 -4 11 -4 -11 -11 -4 11 -4z" fill="currentColor" opacity=".55"/>
+          </svg>
+          <h3 data-i18n="ear">Ear piercing</h3>
+          <p data-i18n="ear_p">Clean, careful ear piercing for children, with advice on aftercare.</p>
+        </article>
+      </div>
+      <div class="emergency" role="note">
+        <strong data-i18n="emerg_h">In an emergency</strong>
+        <p data-i18n="emerg_p">If your child has trouble breathing, has a fit (seizure), is hard to wake, or is badly injured, go to the nearest hospital emergency department straight away. Do not wait for an appointment.</p>
+      </div>
+    </section>
+
     <section class="card" id="booking">
-      <h2>Book an appointment</h2>
-      <p class="sub">Only your name is required. Add the other details if you can, so we can reach you and prepare for the visit.</p>
+      <h2 data-i18n="book_h">Book an appointment</h2>
+      <p class="sub" data-i18n="book_sub">Only your name is required. Add the other details if you can, so we can reach you and prepare for the visit.</p>
 
       <form id="booking-form" novalidate>
         <div class="grid">
           <div>
-            <label for="name">Parent's full name *</label>
+            <label for="name" data-i18n="f_name">Parent's full name *</label>
             <input id="name" name="name" autocomplete="name" required>
           </div>
           <div>
-            <label for="email">Email</label>
-            <input id="email" name="email" type="email" autocomplete="email">
+            <label for="email" data-i18n="f_email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" dir="ltr">
           </div>
           <div>
-            <label for="phone">Phone</label>
-            <input id="phone" name="phone" type="tel" autocomplete="tel">
+            <label for="phone" data-i18n="f_phone">Phone</label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" dir="ltr">
           </div>
           <div>
-            <label for="date">Date</label>
+            <label for="date" data-i18n="f_date">Date</label>
             <input id="date" name="date" type="date">
           </div>
           <div>
-            <label for="time">Time</label>
+            <label for="time" data-i18n="f_time">Time</label>
             <select id="time" name="time"></select>
           </div>
           <div>
-            <label for="visit">Reason for visit</label>
+            <label for="visit" data-i18n="f_reason">Reason for visit</label>
             <select id="visit" name="visit">
-              <option value="">Select a reason</option>
-              <option>Vaccination</option>
-              <option>Consultation</option>
-              <option>Ear piercing</option>
-              <option>Observation (less than 6 hrs)</option>
-              <option>Observation (more than 6 hrs)</option>
+              <option value="" data-i18n="f_reason_ph">Select a reason</option>
+              <option value="Vaccination" data-i18n="vacc">Vaccination</option>
+              <option value="Consultation" data-i18n="cons">Consultation</option>
+              <option value="Ear piercing" data-i18n="ear">Ear piercing</option>
+              <option value="Observation (less than 6 hrs)" data-i18n="obs_short">Observation (less than 6 hrs)</option>
+              <option value="Observation (more than 6 hrs)" data-i18n="obs_long">Observation (more than 6 hrs)</option>
             </select>
           </div>
           <div class="full">
-            <span class="label-text">Child details</span>
+            <span class="label-text" data-i18n="f_children">Child details</span>
             <div id="children"></div>
-            <button class="btn secondary small" id="add-child" type="button">+ Add another child</button>
+            <button class="btn secondary small" id="add-child" type="button" data-i18n="add_child">+ Add another child</button>
           </div>
         </div>
 
         <div class="actions">
-          <button class="btn" type="submit">Book appointment</button>
+          <button class="btn" type="submit" data-i18n="submit">Book appointment</button>
         </div>
         <div class="msg" id="booking-msg" hidden></div>
       </form>
     </section>
   </main>
+
+  <footer>
+    <span data-i18n="credits">Illustrative photos</span>:
+    <a href="https://www.flickr.com/photos/121483302@N02/14007845084">"Child vaccinated"</a> by theglobalpanorama, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA 2.0</a>;
+    <a href="https://www.flickr.com/photos/10485077@N06/3135165977">"Doctor Aunt"</a> by edenpictures, <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a>;
+    <a href="https://www.flickr.com/photos/14214150@N02/8806268443">"Teaching the importance of breastfeeding in India"</a> by DFID, <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a>. Photos cropped.
+  </footer>
 
   <script src="app.js"></script>
 </body>

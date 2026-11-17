@@ -9,6 +9,8 @@
   --on-brand: #ffffff;
   --danger: #b42318;
   --ok: #067647;
+  --danger-bg: #fef3f2;
+  --tint: #e3f3f0;
   --radius: 12px;
 }
 
@@ -22,6 +24,9 @@
     --brand: #2dd4bf;
     --brand-dark: #5eead4;
     --on-brand: #0e1620;
+    --danger: #f97066;
+    --danger-bg: #2b1716;
+    --tint: #123330;
   }
 }
 
@@ -29,7 +34,7 @@
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Kannada", "Noto Sans Telugu", sans-serif;
   background: var(--bg);
   color: var(--text);
   line-height: 1.5;
@@ -106,7 +111,7 @@ header {
   .hero h1 { font-size: 1.6rem; }
 }
 
-nav a { color: var(--muted); margin-left: 16px; text-decoration: none; }
+nav a { color: var(--muted); margin-inline-start: 16px; text-decoration: none; }
 nav a:hover { color: var(--brand); }
 
 .auth { display: flex; align-items: center; gap: 12px; font-size: 0.9rem; color: var(--muted); }
@@ -179,7 +184,7 @@ input:focus, select:focus, textarea:focus {
 
 .msg { padding: 12px 14px; border-radius: 8px; margin-top: 16px; }
 .msg.ok { background: #ecfdf3; color: var(--ok); }
-.msg.error { background: #fef3f2; color: var(--danger); }
+.msg.error { background: var(--danger-bg); color: var(--danger); }
 .msg.info { background: var(--bg); color: var(--muted); border: 1px solid var(--line); }
 
 [hidden] { display: none !important; }
@@ -219,3 +224,41 @@ input:focus, select:focus, textarea:focus {
   .appt { grid-template-columns: 1fr; }
   .row-actions { justify-content: flex-start; }
 }
+
+/* ---------- language switch ---------- */
+.lang-switch { display: flex; flex-wrap: wrap; gap: 6px; }
+.lang-switch button {
+  font: inherit; font-size: 0.9rem; line-height: 1.4;
+  padding: 4px 12px; border-radius: 999px; cursor: pointer;
+  background: transparent; color: var(--text); border: 1px solid var(--line);
+}
+.lang-switch button:hover { border-color: var(--brand); }
+.lang-switch button[aria-pressed="true"] { background: var(--brand); color: var(--on-brand); border-color: var(--brand); }
+.lang-switch button[lang="ur"] { font-family: "Noto Nastaliq Urdu", serif; }
+
+/* ---------- clinical summary ---------- */
+.services {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.service { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.service img, .service .art { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; }
+.service .art { background: var(--tint); color: var(--brand); }
+.service h3 { font-size: 1.05rem; margin: 12px 14px 4px; }
+.service p { margin: 0 14px 14px; color: var(--muted); font-size: 0.95rem; }
+
+.emergency {
+  margin-top: 20px; padding: 14px 16px; border-radius: 8px;
+  background: var(--danger-bg); border-inline-start: 4px solid var(--danger);
+}
+.emergency strong { color: var(--danger); }
+.emergency p { margin: 4px 0 0; }
+
+footer { max-width: 880px; margin: 0 auto 32px; padding: 0 16px; color: var(--muted); font-size: 0.8rem; }
+footer a { color: inherit; }
+
+/* ---------- Urdu ---------- */
+html[lang="ur"] body { font-family: "Noto Nastaliq Urdu", "Noto Naskh Arabic", serif; line-height: 2.1; }
+html[lang="ur"] h1, html[lang="ur"] h2, html[lang="ur"] h3 { line-height: 1.9; }
+html[lang="ur"] .lang-switch button:not([lang="ur"]) { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Kannada", "Noto Sans Telugu", sans-serif; }

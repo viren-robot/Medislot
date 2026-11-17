@@ -31,7 +31,16 @@
     return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
   }
 
+  // Booking page text comes from i18n.js; the doctor page stays in English.
+  var I18N = window.I18N;
+  function t(key, vars) { return I18N ? I18N.t(key, vars) : key; }
+  function localized() { return I18N && I18N.lang() !== "en"; }
+
   function formatTime(hhmm) {
+    if (localized()) {
+      var hm = hhmm.split(":").map(Number);
+      return new Date(2000, 0, 1, hm[0], hm[1]).toLocaleTimeString(I18N.locale(), { hour: "numeric", minute: "2-digit" });
+    }
     var parts = hhmm.split(":").map(Number);
     var h = parts[0], m = parts[1];
     var suffix = h >= 12 ? "PM" : "AM";
@@ -41,7 +50,7 @@
 
   function formatDate(iso) {
     var d = new Date(iso + "T00:00:00");
-    return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+    return d.toLocaleDateString(localized() ? I18N.locale() : undefined, { weekday: "short", month: "short", day: "numeric", year: "numeric" });
   }
 
   function timeSlots() {
@@ -95,13 +104,14 @@
     function addChildRow() {
       var count = childrenEl.querySelectorAll(".child-row").length;
       var row = el("div", { className: "child-row" }, [
-        el("input", { className: "child-name", placeholder: "Child's name", "aria-label": "Child's name", autocomplete: "off" }),
-        el("input", { className: "child-age", type: "number", min: "0", max: String(MAX_AGE), step: "1", placeholder: "Age (years)", "aria-label": "Child's age in years" }),
-        el("button", { className: "btn small danger", type: "button", onclick: function () {
+        el("input", { className: "child-name", "data-i18n-placeholder": "child_name", "data-i18n-aria": "child_name", autocomplete: "off" }),
+        el("input", { className: "child-age", type: "number", min: "0", max: String(MAX_AGE), step: "1", "data-i18n-placeholder": "child_age", "data-i18n-aria": "child_age_aria" }),
+        el("button", { className: "btn small danger", type: "button", "data-i18n": "remove", onclick: function () {
           row.parentNode.removeChild(row);
           addChildBtn.disabled = false;
-        } }, ["Remove"])
+        } })
       ]);
+      if (I18N) I18N.apply(row);
       if (count === 0) row.querySelector(".btn").hidden = true;
       childrenEl.appendChild(row);
       if (childrenEl.querySelectorAll(".child-row").length >= MAX_CHILDREN) addChildBtn.disabled = true;
@@ -135,29 +145,36 @@
       if (!day) return Promise.resolve();
       if (isClosedDay(day)) {
         timeEl.innerHTML = "";
-        timeEl.appendChild(el("option", { value: "" }, ["Closed on Sundays"]));
+        timeEl.appendChild(el("option", { value: "" }, [t("closed_sun")]));
         return Promise.resolve();
       }
       return takenTimes(day).then(function (taken) {
         var isToday = day === isoDate(new Date());
         var now = nowHHMM();
         timeEl.innerHTML = "";
-        timeEl.appendChild(el("option", { value: "" }, ["Select a time"]));
-        timeSlots().forEach(function (t) {
-          var past = isToday && t <= now;
-          var booked = taken.indexOf(t) !== -1;
-          var label = formatTime(t) + (booked ? " (booked)" : past ? " (passed)" : "");
-          var opt = el("option", { value: t }, [label]);
+        timeEl.appendChild(el("option", { value: "" }, [t("select_time")]));
+        timeSlots().forEach(function (slot) {
+          var past = isToday && slot <= now;
+          var booked = taken.indexOf(slot) !== -1;
+          var label = formatTime(slot) + (booked ? " (" + t("booked") + ")" : past ? " (" + t("passed") + ")" : "");
+          var opt = el("option", { value: slot }, [label]);
           if (booked || past) opt.disabled = true;
           timeEl.appendChild(opt);
         });
         if (previous) timeEl.value = previous;
       }).catch(function () {
-        showMsg(msg, "Could not load available times. Please refresh the page.", "error");
+        showMsg(msg, t("err_times"), "error");
       });
     }
 
     dateEl.addEventListener("change", refreshTimes);
+
+    // i18n.js has already re-labelled the page; rebuild the time list and drop
+    // any message shown in the old language.
+    document.addEventListener("langchange", function () {
+      msg.hidden = true;
+      refreshTimes();
+    });
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
@@ -173,19 +190,19 @@
       var children = readChildren().filter(function (c) { return c.name || c.age !== ""; });
 
       if (!data.name) {
-        return showMsg(msg, "Please enter the parent's name.", "error");
+        return showMsg(msg, t("err_name"), "error");
       }
       if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-        return showMsg(msg, "Please check the email address, or leave it blank.", "error");
+        return showMsg(msg, t("err_email"), "error");
       }
       if (data.phone && data.phone.length < 3) {
-        return showMsg(msg, "Please check the phone number, or leave it blank.", "error");
+        return showMsg(msg, t("err_phone"), "error");
       }
       var badAge = children.some(function (c) {
         return c.age !== "" && (Number(c.age) < 0 || Number(c.age) > MAX_AGE || Math.floor(Number(c.age)) !== Number(c.age));
       });
       if (badAge) {
-        return showMsg(msg, "Please give ages in whole years (0 to " + MAX_AGE + "), or leave them blank.", "error");
+        return showMsg(msg, t("err_age", { max: MAX_AGE }), "error");
       }
 
       // A time without a date can't be booked, so it is dropped.
@@ -208,9 +225,9 @@
           // 23505 = unique violation: someone else took this slot first.
           if (res.error.code === "23505") {
             refreshTimes();
-            return showMsg(msg, "That time was just booked. Please choose another.", "error");
+            return showMsg(msg, t("err_taken"), "error");
           }
-          return showMsg(msg, "Could not save your booking. Please try again.", "error");
+          return showMsg(msg, t("err_save"), "error");
         }
         form.reset();
         childrenEl.innerHTML = "";
@@ -218,10 +235,10 @@
         addChildRow();
         dateEl.value = nextOpenDay();
         refreshTimes();
-        var when = date && time ? formatDate(date) + " at " + formatTime(time)
-          : date ? formatDate(date) + ". The clinic will confirm a time"
-          : "No date chosen yet. The clinic will contact you to arrange one";
-        showMsg(msg, "Booked! " + when + ".", "ok");
+        var when = date && time ? t("when_full", { date: formatDate(date), time: formatTime(time) })
+          : date ? t("when_date", { date: formatDate(date) })
+          : t("when_none");
+        showMsg(msg, t("ok", { when: when }), "ok");
       });
     });
 
